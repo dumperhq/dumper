@@ -29,7 +29,7 @@ module Dumper
           next unless File.exist?(fullpath)
           File.readlines(fullpath).each do |line|
             if line =~ /^bind-address/
-              bound = line.split('=').strip
+              bound = line.split('=').last.strip
               break
             end
           end
