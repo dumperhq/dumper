@@ -11,14 +11,14 @@ module Dumper
     no_tasks do
       def check_ip
         puts 'Checking IP address...'
-        ip = IPSocket.getaddress(Socket.gethostname)
-        ip_str = "#{ip} ... "
-        if IPAddr.new(ip).private?
-          ip_str << 'private'.color(:red)
+        @ip = Dumper::Utility::IP.new
+        str = "#{@ip.ip} ... "
+        if @ip.ipaddr.private?
+          str << 'private'.color(:red)
         else
-          ip_str << 'public'.color(:green)
+          str << 'public'.color(:green)
         end
-        puts ip_str
+        puts str
       end
 
       def check_cnf
