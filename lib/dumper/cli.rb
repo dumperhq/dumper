@@ -1,3 +1,6 @@
+Dumper::Dependency.load('thor')
+Dumper::Dependency.load('rainbow')
+
 module Dumper
   class Cli < Thor
     include Thor::Actions

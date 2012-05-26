@@ -1,19 +1,27 @@
-# Dumper
+# Dumper Agent for Rails
 
-Utility that checks the status of a database.
+Dumper is a backup management system that offers a whole new way to take daily backups of your databases.
+
+** This app will be launched soon! **
+
+## Supported Stacks
+
+* Ruby 1.8.7 , Ruby 1.9.2 or later
+* Rails 3.0 or later
+* MySQL with ActiveRecord
+
+Support for PostgreSQL, MongoDB and Redis are coming soon.
 
 ## Installation
 
-    $ gem install dumper
+Add the following line to your Rails project Gemfile:
 
-## Usage
+```ruby
+gem 'dumper'
+```
 
-TODO: Write usage instructions here
+then create `config/initializers/dumper.rb` and put the following line.
 
-## Contributing
-
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Added some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+```ruby
+Dumper::Agent.start(:app_key => 'YOUR_APP_KEY')
+```

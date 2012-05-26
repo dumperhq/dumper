@@ -1,9 +1,16 @@
-require 'thor'
-require 'rainbow'
 require 'socket'
 
 module Dumper
-  autoload :Cli,      'dumper/cli'
-  autoload :Utility,  'dumper/utility'
-  autoload :VERSION,  'dumper/version'
+  autoload :Agent,      'dumper/agent'
+  autoload :Cli,        'dumper/cli'
+  autoload :Dependency, 'dumper/dependency'
+  autoload :Job,        'dumper/job'
+  autoload :Stack,      'dumper/stack'
+  autoload :Utility,    'dumper/utility'
+  autoload :VERSION,    'dumper/version'
+
+  module Database
+    autoload :Base,   'dumper/database/base'
+    autoload :MySQL,  'dumper/database/mysql'
+  end
 end

@@ -1,4 +1,5 @@
 require 'ipaddr'
+require 'logger'
 
 module Dumper
   module Utility
@@ -33,6 +34,38 @@ module Dumper
         [ IPAddr.new("10.0.0.0/8"),
           IPAddr.new("172.16.0.0/12"),
           IPAddr.new("192.168.0.0/16") ].any?{|i| i.include? self }
+      end
+    end
+
+    class SlimLogger < ::Logger
+      def initialize(logdev, shift_age = 0, shift_size = 1048576)
+        super
+        self.formatter = SlimFormatter.new
+        self.formatter.datetime_format = "%Y-%m-%dT%H:%M:%S"
+        self.level = Logger::INFO
+      end
+      
+      class SlimFormatter < ::Logger::Formatter
+        # This method is invoked when a log event occurs
+        def call(severity, time, progname, msg)
+          "[%s] %5s : %s\n" % [format_datetime(time), severity, msg2str(msg)]
+        end
+      end
+    end
+
+    module LoggingMethods
+      def logger
+        @logger ||= Dumper::Utility::SlimLogger.new("#{Rails.root}/log/dumper_agent.log", 1, 10.megabytes)
+      end
+
+      def log(msg, level=:info)
+        STDOUT.puts "** [Dumper] " + msg
+        return unless true #should_log?
+        logger.send level, msg
+      end
+
+      def log_last_error
+        log [ $!.class.name, $!.to_s ].join(', ')
       end
     end
   end
