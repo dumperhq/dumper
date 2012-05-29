@@ -27,6 +27,7 @@ module Dumper
       @app_key = options[:app_key]
       @app_env = @stack.rails_env
       @app_name = ObjectSpace.each_object(Rails::Application).first.class.name.split("::").first
+      logger.level = stdout_logger.level = options[:loglevel] if options[:loglevel]
     end
 
     def start
@@ -38,12 +39,17 @@ module Dumper
     end
 
     def start_loop
-      sleep 5
-      json = send_request(api: 'agent/register', json: MultiJson.encode(register_hash))
-      return log('agent/register failed. agent not running.') unless json[:status] == 'ok'
-      @token = json[:token]
-      sleep 5
+      sec = 1
+      begin
+        sec *= 2
+        log "sleeping #{sec} seconds for agent/register.", :debug
+        sleep sec
+        json = send_request(api: 'agent/register', json: MultiJson.encode(register_hash))
+      end until json[:status] == 'ok'
+
       log 'agent started.'
+      @token = json[:token]
+      sleep 1.hour unless @token
 
       loop do
         json = send_request(api: 'agent/poll', params: { token: @token })

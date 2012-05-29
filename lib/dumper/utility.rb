@@ -37,7 +37,7 @@ module Dumper
       end
     end
 
-    class SlimLogger < ::Logger
+    class SlimLogger < Logger
       def initialize(logdev, shift_age = 0, shift_size = 1048576)
         super
         self.formatter = SlimFormatter.new
@@ -45,7 +45,7 @@ module Dumper
         self.level = Logger::INFO
       end
       
-      class SlimFormatter < ::Logger::Formatter
+      class SlimFormatter < Logger::Formatter
         # This method is invoked when a log event occurs
         def call(severity, time, progname, msg)
           "[%s] %5s : %s\n" % [format_datetime(time), severity, msg2str(msg)]
@@ -58,8 +58,12 @@ module Dumper
         @logger ||= Dumper::Utility::SlimLogger.new("#{Rails.root}/log/dumper_agent.log", 1, 10.megabytes)
       end
 
+      def stdout_logger
+        @stdout_logger ||= Dumper::Utility::SlimLogger.new(STDOUT)
+      end
+
       def log(msg, level=:info)
-        STDOUT.puts "** [Dumper] " + msg
+        stdout_logger.send level, "** [Dumper] " + msg
         return unless true #should_log?
         logger.send level, msg
       end
