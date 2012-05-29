@@ -38,13 +38,17 @@ module Dumper
     end
 
     def start_loop
-      sleep 3
+      sleep 5
       json = send_request(api: 'agent/register', json: MultiJson.encode(register_hash))
-      @token = json[:token] if json && json[:token]
-      sleep 3
+      return log('agent/register failed. agent not running.') unless json[:status] == 'ok'
+      @token = json[:token]
+      sleep 5
+      log 'agent started.'
+
       loop do
         json = send_request(api: 'agent/poll', params: { token: @token })
-        if json
+
+        if json[:status] == 'ok'
           # Promoted or demoted?
           if json[:token]
             @token = json[:token] # promote
@@ -63,6 +67,7 @@ module Dumper
             end
           end
         end
+
         sleep @token ? 60.seconds : 1.hour
       end
     end
@@ -100,10 +105,11 @@ module Dumper
       response = http.request(request)
       if response.code == '200'
         log response.body, :debug
+        MultiJson.decode(response.body).with_indifferent_access
       else
-        log '******** ERROR!! ********', :error
+        log "******** ERROR on api: #{options[:api]}, resp code: #{response.code} ********", :error
+        {} # return empty hash
       end
-      MultiJson.decode(response.body).with_indifferent_access
     rescue
       log_last_error
       {} # return empty hash
