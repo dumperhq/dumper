@@ -2,7 +2,7 @@
 
 Dumper is a backup management system that offers a whole new way to take daily backups of your databases.
 
-** This app will be launched soon! **
+**This app will be launched soon!**
 
 ## Supported Stacks
 
@@ -25,3 +25,9 @@ then create `config/initializers/dumper.rb` and put the following line.
 ```ruby
 Dumper::Agent.start(:app_key => 'YOUR_APP_KEY')
 ```
+
+That's it!
+
+Now, start your server and go to the Dumper site.
+
+You'll find your application is registered and ready to take backups daily.
