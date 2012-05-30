@@ -2,7 +2,7 @@ module Dumper
   module Database
     class MySQL < Base
       def command
-        "mysqldump #{connection_options} #{additional_options} #{@stack.activerecord_config['database']} | gzip"
+        "#{@stack.dump_tool(:mysqldump)} #{connection_options} #{additional_options} #{@stack.activerecord_config['database']} | gzip"
       end
 
       protected

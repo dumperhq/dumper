@@ -45,10 +45,12 @@ module Dumper
         log "sleeping #{sec} seconds for agent/register.", :debug
         sleep sec
         json = send_request(api: 'agent/register', json: MultiJson.encode(register_hash))
-      end until json[:status] == 'ok'
+      end until json[:status]
 
-      log 'agent started.'
+      return log("agent stopped: #{json.to_s}") if json[:status] == 'error'
+
       @token = json[:token]
+      log "agent started as #{@token ? 'primary' : 'secondary'}"
       sleep 1.hour unless @token
 
       loop do

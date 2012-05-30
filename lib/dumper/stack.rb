@@ -1,5 +1,7 @@
 module Dumper
   class Stack
+    DUMP_TOOLS = {}
+
     attr_accessor :rails_env, :dispatcher, :framework, :rackup, :activerecord_config
 
     def initialize
@@ -30,12 +32,28 @@ module Dumper
         rails_version: @rails_version,
         dispatcher: @dispatcher,
         activerecord_config: @activerecord_config.reject{|k,v| k == 'password' },
+        dump_tools: DUMP_TOOLS,
       }
     end
 
     # Compatibility
     def supported?
-      @is_supported_rails_version && @dispatcher && %w(mysql mysql2).include?(@activerecord_config['adapter'])
+      @is_supported_rails_version && @dispatcher && mysql?
+    end
+
+    # Database
+    def mysql?
+      dump_tool(:mysqldump) # Just assign DUMP_TOOLS
+      %w(mysql mysql2).include?(@activerecord_config['adapter'])
+    end
+
+    # Dump Tool
+    def dump_tool(name)
+      DUMP_TOOLS[name] ||= `which #{name}`.chomp
+    end
+
+    def dump_tool_installed?(name)
+      !dump_tool(name).empty?
     end
 
     # Dispatcher
