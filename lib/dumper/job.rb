@@ -5,6 +5,8 @@ module Dumper
     include POSIX::Spawn
     include Dumper::Utility::LoggingMethods
 
+    MAX_FILESIZE = 4.gigabytes
+
     def initialize(agent, job)
       @agent = agent
       @stack = agent.stack
@@ -50,7 +52,7 @@ module Dumper
         buffer = "\x00" * buffer_size # fixed-size malloc optimization
         while stdout.read(buffer_size, buffer)
           tempfile.write buffer
-          if tempfile.size > Backup::MAX_FILESIZE
+          if tempfile.size > MAX_FILESIZE
             raise 'Max filesize exceeded.'
           end
         end

@@ -31,8 +31,8 @@ module Dumper
     end
 
     def start
-      return unless @app_key and @stack.supported?
       log "stack: dispatcher = #{@stack.dispatcher}, framework = #{@stack.framework}, rackup = #{@stack.rackup}"
+      return log('agent cannot start') unless @app_key and @stack.supported?
 
       @loop_thread = Thread.new { start_loop }
       @loop_thread[:name] = 'Loop Thread'
@@ -42,7 +42,7 @@ module Dumper
       sec = 1
       begin
         sec *= 2
-        log "sleeping #{sec} seconds for agent/register.", :debug
+        log "sleeping #{sec} seconds for agent/register", :debug
         sleep sec
         json = send_request(api: 'agent/register', json: MultiJson.encode(register_hash))
       end until json[:status]
