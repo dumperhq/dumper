@@ -22,7 +22,7 @@ module Dumper
         @rails_version = Rails::VERSION::STRING
         @is_supported_rails_version = (::Rails::VERSION::MAJOR >= 3)
         DATABASES.each do |key, klass|
-          next unless config = klass.config_for(@rails_env)
+          next unless config = klass.new.config_for(@rails_env)
           @configs[key] = config
         end
 
