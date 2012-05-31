@@ -44,7 +44,7 @@ module Dumper
         sec *= 2
         log "sleeping #{sec} seconds for agent/register", :debug
         sleep sec
-        json = send_request(api: 'agent/register', json: MultiJson.encode(register_hash))
+        json = send_request(api: 'agent/register', json: MultiJson.dump(register_hash))
       end until json[:status]
 
       return log("agent stopped: #{json.to_s}") if json[:status] == 'error'
@@ -113,7 +113,7 @@ module Dumper
       response = http.request(request)
       if response.code == '200'
         log response.body, :debug
-        MultiJson.decode(response.body).with_indifferent_access
+        MultiJson.load(response.body).with_indifferent_access
       else
         log "******** ERROR on api: #{options[:api]}, resp code: #{response.code} ********", :error
         {} # return empty hash

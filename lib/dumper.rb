@@ -10,7 +10,8 @@ module Dumper
   autoload :VERSION,    'dumper/version'
 
   module Database
-    autoload :Base,   'dumper/database/base'
-    autoload :MySQL,  'dumper/database/mysql'
+    autoload :Base,     'dumper/database/base'
+    autoload :MySQL,    'dumper/database/mysql'
+    autoload :MongoDB,  'dumper/database/mongodb'
   end
 end

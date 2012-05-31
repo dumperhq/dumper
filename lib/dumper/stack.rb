@@ -2,11 +2,16 @@ module Dumper
   class Stack
     include Dumper::Utility::ObjectFinder
 
-    DUMP_TOOLS = {}
+    DATABASES = {
+      :mysql => Dumper::Database::MySQL,
+      :mongodb => Dumper::Database::MongoDB,
+    }
 
-    attr_accessor :rails_env, :dispatcher, :framework, :rackup, :activerecord_config
+    attr_accessor :rails_env, :dispatcher, :framework, :rackup, :configs
 
     def initialize
+      @configs = {}
+
       # Rackup?
       @rackup = find_instance_in_object_space(Rack::Server)
 
@@ -16,7 +21,11 @@ module Dumper
         @rails_env = Rails.env.to_s
         @rails_version = Rails::VERSION::STRING
         @is_supported_rails_version = (::Rails::VERSION::MAJOR >= 3)
-        @activerecord_config = ActiveRecord::Base.configurations[@rails_env]
+        DATABASES.each do |key, klass|
+          next unless config = klass.config_for(@rails_env)
+          @configs[key] = config
+        end
+
       else
         @framework = :ruby
       end
@@ -33,25 +42,13 @@ module Dumper
         rails_env: @rails_env,
         rails_version: @rails_version,
         dispatcher: @dispatcher,
-        activerecord_config: @activerecord_config.reject{|k,v| k == 'password' },
-        dump_tools: DUMP_TOOLS,
+        configs: Hash[@configs.map{|k, config| [ k, config.reject{|k,v| k == :password } ] }]
       }
     end
 
     # Compatibility
     def supported?
-      @is_supported_rails_version && @dispatcher && mysql?
-    end
-
-    # Database
-    def mysql?
-      dump_tool(:mysqldump) # Just assign DUMP_TOOLS
-      %w(mysql mysql2).include?(@activerecord_config['adapter'])
-    end
-
-    # Dump Tool
-    def dump_tool(name)
-      DUMP_TOOLS[name] ||= `which #{name}`.chomp
+      @is_supported_rails_version && @dispatcher && !@configs.empty?
     end
 
     # Dispatcher
@@ -64,8 +61,8 @@ module Dumper
     end
 
     def thin?
-      defined?(::Thin::Server) && find_instance_in_object_space(::Thin::Server)
-      # @rackup and @rackup.server.to_s.demodulize == 'Thin'
+      defined?(::Thin::Server) && find_instance_in_object_space(::Thin::Server) ||
+        (@rackup && @rackup.server.to_s.demodulize == 'Thin')
     end
 
     def mongrel?
