@@ -72,5 +72,11 @@ module Dumper
         log [ $!.class.name, $!.to_s ].join(', ')
       end
     end
+
+    module ObjectFinder
+      def find_instance_in_object_space(klass)
+        ObjectSpace.each_object(klass).first
+      end
+    end
   end
 end

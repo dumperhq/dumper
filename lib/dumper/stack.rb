@@ -1,5 +1,7 @@
 module Dumper
   class Stack
+    include Dumper::Utility::ObjectFinder
+
     DUMP_TOOLS = {}
 
     attr_accessor :rails_env, :dispatcher, :framework, :rackup, :activerecord_config
@@ -78,10 +80,6 @@ module Dumper
     def webrick?
       # defined?(::WEBrick::VERSION)
       @rackup and @rackup.server.to_s.demodulize == 'WEBrick'
-    end
-
-    def find_instance_in_object_space(klass)
-      ObjectSpace.each_object(klass).first
     end
   end
 end
