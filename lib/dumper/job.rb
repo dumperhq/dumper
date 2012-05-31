@@ -31,6 +31,8 @@ module Dumper
       case server[:type]
       when 'mysql'
         @database = Dumper::Database::MySQL.new(@stack)
+      when 'mongodb'
+        @database = Dumper::Database::MongoDB.new(@stack)
       else
         log 'invalid server type!' # TBD
         exit!
