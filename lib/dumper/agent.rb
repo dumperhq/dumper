@@ -31,8 +31,8 @@ module Dumper
     end
 
     def start
+      return unless @stack.supported?
       log "stack: dispatcher = #{@stack.dispatcher}, framework = #{@stack.framework}, rackup = #{@stack.rackup}"
-      return log('agent cannot start') unless @app_key and @stack.supported?
 
       @loop_thread = Thread.new { start_loop }
       @loop_thread[:name] = 'Loop Thread'
@@ -76,14 +76,13 @@ module Dumper
           end
         end
 
-        sleep @token ? 60.seconds : 1.hour
+        sleep [ json[:interval].to_i, 60 ].max
       end
     end
 
     def register_hash
       {
-        # :pid => Process.pid,
-        # :host => Socket.gethostname,
+        :hostname => Socket.gethostname,
         :agent_version => Dumper::VERSION,
         :app_name => @app_name,
         :stack => @stack.to_hash,
