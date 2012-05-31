@@ -3,8 +3,15 @@ module Dumper
     class Base
       include Dumper::Utility::ObjectFinder
 
-      def initialize(stack = nil)
+      attr_accessor :tempfile
+
+      def initialize(stack = nil, options = {})
         @stack = stack
+        @options = options
+      end
+
+      def file_ext
+        self.class::FILE_EXT
       end
 
       def dump_tool_path

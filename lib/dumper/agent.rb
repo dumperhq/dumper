@@ -44,7 +44,7 @@ module Dumper
         sec *= 2
         log "sleeping #{sec} seconds for agent/register", :debug
         sleep sec
-        json = send_request(api: 'agent/register', json: MultiJson.dump(register_hash))
+        json = api_request('agent/register', :json => MultiJson.dump(register_hash))
       end until json[:status]
 
       return log("agent stopped: #{json.to_s}") if json[:status] == 'error'
@@ -54,7 +54,7 @@ module Dumper
       sleep 1.hour unless @token
 
       loop do
-        json = send_request(api: 'agent/poll', params: { token: @token })
+        json = api_request('agent/poll', :params => { :token => @token })
 
         if json[:status] == 'ok'
           # Promoted or demoted?
@@ -89,8 +89,8 @@ module Dumper
       }
     end
 
-    def send_request(options)
-      uri = URI.parse("#{@api_base}/api/#{options[:api]}")
+    def api_request(method_name, options)
+      uri = URI.parse("#{@api_base}/api/#{method_name}")
       http = Net::HTTP.new(uri.host, uri.port)
       if uri.is_a? URI::HTTPS
         http.use_ssl = true
@@ -114,7 +114,7 @@ module Dumper
         log response.body, :debug
         MultiJson.load(response.body).with_indifferent_access
       else
-        log "******** ERROR on api: #{options[:api]}, resp code: #{response.code} ********", :error
+        log "******** ERROR on api: #{method_name}, resp code: #{response.code} ********", :error
         {} # return empty hash
       end
     rescue

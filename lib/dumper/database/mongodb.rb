@@ -2,9 +2,10 @@ module Dumper
   module Database
     class MongoDB < Base
       DUMP_TOOL = 'mongodump'
+      FILE_EXT = 'tar.gz'
 
       def command
-        "#{@stack.configs[:mongodb][:dump_tool]} #{connection_options} #{additional_options} | gzip"
+        "#{@stack.configs[:mongodb][:dump_tool]} #{connection_options} #{additional_options} && cd #{@options[:tmpdir]} && tar -czf #{@tempfile.path} ."
       end
 
       def connection_options
@@ -15,8 +16,11 @@ module Dumper
       end
 
       def additional_options
-        # '--oplog --out -'
-        '--out -'
+        "--out='#{@options[:tmpdir]}'"
+      end
+
+      def finalize
+        FileUtils.remove_entry_secure @options[:tmpdir] if File.exist? @options[:tmpdir]
       end
 
       def config_for(rails_env=nil)
