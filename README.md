@@ -9,8 +9,9 @@ Dumper is a backup management system that offers a whole new way to take daily b
 * Ruby 1.8.7 , Ruby 1.9.2 or later
 * Rails 3.0 or later
 * MySQL with ActiveRecord
+* MongoDB with mongo gem (including Mongoid 2.x)
 
-Support for PostgreSQL, MongoDB and Redis are coming soon.
+Support for PostgreSQL and Redis are coming soon.
 
 ## Installation
 
