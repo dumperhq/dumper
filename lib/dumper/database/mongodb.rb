@@ -24,7 +24,8 @@ module Dumper
       end
 
       def config_for(rails_env=nil)
-        return unless mongo = find_instance_in_object_space(Mongo::DB)
+        return unless defined?(Mongo::DB) &&
+          mongo = find_instance_in_object_space(Mongo::DB)
 
         {
           :host => mongo.connection.host,
