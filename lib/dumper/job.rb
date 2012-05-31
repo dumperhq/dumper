@@ -20,7 +20,7 @@ module Dumper
     ensure
       log_last_error if $!
       log 'exiting...'
-      exit
+      exit!(true) # Do not use exit or abort to skip at_exit execution, or pid could get deleted on thin
     end
 
     def perform(server)
@@ -32,7 +32,8 @@ module Dumper
       when 'mysql'
         @database = Dumper::Database::MySQL.new(@stack)
       else
-        abort 'invalid server type!' # TBD
+        log 'invalid server type!' # TBD
+        exit!
       end
       backup_id = json[:backup][:id]
       filename = json[:backup][:filename]
@@ -59,7 +60,7 @@ module Dumper
       rescue
         Process.kill(:INT, pid) rescue SystemCallError
         @agent.send_request(api: 'backup/fail', params: { backup_id: backup_id, code: 'dump_error', message: $!.to_s })
-        abort
+        exit!
       ensure
         [stdin, stdout, stderr].each{|io| io.close unless io.closed? }
         Process.waitpid(pid)
