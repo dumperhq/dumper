@@ -54,10 +54,6 @@ module Dumper
       DUMP_TOOLS[name] ||= `which #{name}`.chomp
     end
 
-    def dump_tool_installed?(name)
-      !dump_tool(name).empty?
-    end
-
     # Dispatcher
     def unicorn?
       defined?(::Unicorn::HttpServer) && find_instance_in_object_space(::Unicorn::HttpServer)
@@ -68,8 +64,8 @@ module Dumper
     end
 
     def thin?
-      # defined?(::Thin::Server) && find_instance_in_object_space(Thin::Server)
-      @rackup and @rackup.server.to_s.demodulize == 'Thin'
+      defined?(::Thin::Server) && find_instance_in_object_space(::Thin::Server)
+      # @rackup and @rackup.server.to_s.demodulize == 'Thin'
     end
 
     def mongrel?
