@@ -5,6 +5,7 @@ module Dumper
     DATABASES = {
       :mysql => Dumper::Database::MySQL,
       :mongodb => Dumper::Database::MongoDB,
+      :redis => Dumper::Database::Redis,
     }
 
     attr_accessor :rails_env, :dispatcher, :framework, :rackup, :configs

@@ -30,6 +30,8 @@ module Dumper
         @database = Dumper::Database::MySQL.new(@stack)
       when 'mongodb'
         @database = Dumper::Database::MongoDB.new(@stack)
+      when 'redis'
+        @database = Dumper::Database::Redis.new(@stack)
       else
         abort_with "invalid server type: #{server[:type]}"
       end

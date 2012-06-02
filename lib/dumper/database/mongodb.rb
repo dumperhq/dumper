@@ -5,7 +5,7 @@ module Dumper
       FILE_EXT = 'tar.gz'
 
       def command
-        "#{dump_tool_path} #{connection_options} #{additional_options} && cd #{tmpdir} && tar -czf #{filename} ."
+        "cd #{tmpdir} && #{dump_tool_path} #{connection_options} #{additional_options} && tar -czf #{filename} ."
       end
 
       def connection_options

@@ -13,5 +13,6 @@ module Dumper
     autoload :Base,     'dumper/database/base'
     autoload :MySQL,    'dumper/database/mysql'
     autoload :MongoDB,  'dumper/database/mongodb'
+    autoload :Redis,    'dumper/database/redis'
   end
 end
