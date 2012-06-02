@@ -40,7 +40,7 @@ module Dumper
       json = @agent.api_request('backup/prepare', :params => { :server_id => server[:id], :manual => server[:manual].to_s, :ext => @database.file_ext })
       abort_with('backup/prepare failed') unless json[:status] == 'ok'
 
-      backup_id = json[:backup][:id]
+      @backup_id = json[:backup][:id]
 
       # Dump
       start_at = Time.now
@@ -55,9 +55,7 @@ module Dumper
         stdin.close
       rescue
         Process.kill(:INT, pid) rescue SystemCallError
-        @database.finalize
-        @agent.api_request('backup/fail', :params => { :backup_id => backup_id, :code => 'dump_error', :message => $!.to_s })
-        abort_with("dump error: #{$!}")
+        abort_with("dump error: #{$!}", :dump_error)
       ensure
         [stdin, stdout, stderr].each{|io| io.close unless io.closed? }
         Process.waitpid(pid)
@@ -65,11 +63,13 @@ module Dumper
 
       dump_duration = Time.now - start_at
       log "dump_duration = #{dump_duration}"
-      abort_with('max filesize exceeded') if File.size(@database.dump_path) > MAX_FILESIZE
+      if (filesize = File.size(@database.dump_path)) > MAX_FILESIZE
+        abort_with("max filesize exceeded: #{filesize}", :too_large)
+      end
 
       upload_to_s3(json[:url], json[:fields])
 
-      json = @agent.api_request('backup/commit', :params => { :backup_id => backup_id, :dump_duration => dump_duration.to_i })
+      json = @agent.api_request('backup/commit', :params => { :backup_id => @backup_id, :dump_duration => dump_duration.to_i })
     rescue
       log_last_error
     ensure
@@ -94,9 +94,12 @@ module Dumper
       log_last_error
     end
 
-    def abort_with(text)
+    def abort_with(text, code=nil)
       log text
       @database.try(:finalize)
+      if code
+        @agent.api_request('backup/fail', :params => { :backup_id => @backup_id, :code => code.to_s, :message => text })
+      end
       exit!
     end
   end
