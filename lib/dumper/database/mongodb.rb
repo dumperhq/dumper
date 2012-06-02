@@ -5,7 +5,7 @@ module Dumper
       FILE_EXT = 'tar.gz'
 
       def command
-        "#{@stack.configs[:mongodb][:dump_tool]} #{connection_options} #{additional_options} && cd #{@options[:tmpdir]} && tar -czf #{@tempfile.path} ."
+        "#{dump_tool_path} #{connection_options} #{additional_options} && cd #{tmpdir} && tar -czf #{filename} ."
       end
 
       def connection_options
@@ -16,11 +16,7 @@ module Dumper
       end
 
       def additional_options
-        "--out='#{@options[:tmpdir]}'"
-      end
-
-      def finalize
-        FileUtils.remove_entry_secure @options[:tmpdir] if File.exist? @options[:tmpdir]
+        "--out='#{tmpdir}'"
       end
 
       def config_for(rails_env=nil)

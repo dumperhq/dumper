@@ -20,7 +20,7 @@ module Dumper
     end
 
     def initialize(options = {})
-      log '**** Dumper requires :app_key! ****' if options[:app_key].blank?
+      log 'app_key is missing' if options[:app_key].blank?
 
       @stack = Dumper::Stack.new
       @api_base = options[:api_base] || 'http://dumper.io'
@@ -51,7 +51,7 @@ module Dumper
 
       @token = json[:token]
       log "agent started as #{@token ? 'primary' : 'secondary'}"
-      sleep 1.hour unless @token
+      sleep 1.hour + rand(10) unless @token
 
       loop do
         json = api_request('agent/poll', :params => { :token => @token })

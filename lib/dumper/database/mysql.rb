@@ -5,7 +5,7 @@ module Dumper
       FILE_EXT = 'sql.gz'
 
       def command
-        "#{@stack.configs[:mysql][:dump_tool]} #{connection_options} #{additional_options} #{@stack.configs[:mysql][:database]} | gzip > #{@tempfile.path}"
+        "cd #{tmpdir} && #{dump_tool_path} #{connection_options} #{additional_options} #{@stack.configs[:mysql][:database]} | gzip > #{filename}"
       end
 
       def connection_options

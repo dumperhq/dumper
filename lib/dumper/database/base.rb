@@ -3,15 +3,18 @@ module Dumper
     class Base
       include Dumper::Utility::ObjectFinder
 
-      attr_accessor :tempfile
+      attr_accessor :tmpdir, :filename
 
-      def initialize(stack = nil, options = {})
+      def initialize(stack = nil)
         @stack = stack
-        @options = options
       end
 
       def file_ext
         self.class::FILE_EXT
+      end
+
+      def dump_path
+        "#{tmpdir}/#{filename}"
       end
 
       def dump_tool_path
@@ -25,6 +28,10 @@ module Dumper
           path = "#{dir}/#{tool}" if dir
         end
         path
+      end
+
+      def finalize
+        FileUtils.remove_entry_secure tmpdir if File.exist? tmpdir
       end
     end
   end

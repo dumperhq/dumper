@@ -29,45 +29,33 @@ module Dumper
       when 'mysql'
         @database = Dumper::Database::MySQL.new(@stack)
       when 'mongodb'
-        @database = Dumper::Database::MongoDB.new(@stack, :tmpdir => Dir.mktmpdir)
+        @database = Dumper::Database::MongoDB.new(@stack)
       else
-        log "invalid server type: #{server[:type]}"
-        exit!
+        abort_with "invalid server type: #{server[:type]}"
       end
 
       # Prepare
       json = @agent.api_request('backup/prepare', :params => { :server_id => server[:id], :manual => server[:manual].to_s, :ext => @database.file_ext })
-      return unless json[:status] == 'ok'
+      abort_with('backup/prepare failed') unless json[:status] == 'ok'
 
       backup_id = json[:backup][:id]
-      filename = json[:backup][:filename]
 
       # Dump
       start_at = Time.now
-      tempfile = ruby19? ? Tempfile.new(filename, encoding: 'ascii-8bit') : Tempfile.new(filename)
-      @database.tempfile = tempfile
+      @database.tmpdir = Dir.mktmpdir
+      @database.filename = json[:backup][:filename]
       log 'starting backup...'
-      log "tempfile = #{tempfile.path}"
+      log "tmpdir = #{@database.tmpdir}, filename = #{@database.filename}"
       log "command = #{@database.command}"
 
       begin
         pid, stdin, stdout, stderr = popen4(@database.command)
         stdin.close
-        # # Reuse buffer: http://www.ruby-forum.com/topic/134164
-        # buffer_size = 1.megabytes
-        # buffer = "\x00" * buffer_size # fixed-size malloc optimization
-        # while stdout.read(buffer_size, buffer)
-        #   tempfile.write buffer
-        #   if tempfile.size > MAX_FILESIZE
-        #     raise 'Max filesize exceeded.'
-        #   end
-        # end
-        # tempfile.flush
       rescue
         Process.kill(:INT, pid) rescue SystemCallError
-        @database.finalize if @database.respond_to?(:finalize)
+        @database.finalize
         @agent.api_request('backup/fail', :params => { :backup_id => backup_id, :code => 'dump_error', :message => $!.to_s })
-        exit!
+        abort_with("dump error: #{$!}")
       ensure
         [stdin, stdout, stderr].each{|io| io.close unless io.closed? }
         Process.waitpid(pid)
@@ -75,21 +63,21 @@ module Dumper
 
       dump_duration = Time.now - start_at
       log "dump_duration = #{dump_duration}"
+      abort_with('max filesize exceeded') if File.size(@database.dump_path) > MAX_FILESIZE
 
-      upload_to_s3(json[:url], json[:fields], tempfile.path, filename)
+      upload_to_s3(json[:url], json[:fields])
 
       json = @agent.api_request('backup/commit', :params => { :backup_id => backup_id, :dump_duration => dump_duration.to_i })
     rescue
       log_last_error
     ensure
-      tempfile.close(true)
-      @database.finalize if @database.respond_to?(:finalize)
+      @database.finalize
     end
 
     # Upload
-    def upload_to_s3(url, fields, local_file, remote_file)
+    def upload_to_s3(url, fields)
       require 'net/http/post/multipart'
-      fields['file'] = UploadIO.new(local_file, 'application/octet-stream', remote_file)
+      fields['file'] = UploadIO.new(@database.dump_path, 'application/octet-stream', @database.filename)
       uri = URI.parse(url)
       request = Net::HTTP::Post::Multipart.new uri.path, fields
       http = Net::HTTP.new(uri.host, uri.port)
@@ -104,9 +92,10 @@ module Dumper
       log_last_error
     end
 
-    # Helper
-    def ruby19?
-      RUBY_VERSION >= '1.9.0'
+    def abort_with(text)
+      log text
+      @database.try(:finalize)
+      exit!
     end
   end
 end
