@@ -32,7 +32,7 @@ module Dumper
       end
 
       # Which dispatcher?
-      [ :unicorn, :passenger, :thin, :mongrel, :webrick ].find do |name|
+      [ :unicorn, :passenger, :thin, :mongrel, :webrick, :resque ].find do |name|
         @dispatcher = send("#{name}?") ? name : nil
       end
     end
@@ -74,6 +74,10 @@ module Dumper
     def webrick?
       # defined?(::WEBrick::VERSION)
       @rackup and @rackup.server.to_s.demodulize == 'WEBrick'
+    end
+
+    def resque?
+      defined?(::Resque) && (ENV['QUEUES'] || ENV['QUEUE'])
     end
   end
 end
