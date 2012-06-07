@@ -3,7 +3,7 @@ module Dumper
     class Base
       include Dumper::Utility::ObjectFinder
 
-      attr_accessor :tmpdir, :filename
+      attr_accessor :tmpdir, :filename, :config
 
       def initialize(stack = nil)
         @stack = stack

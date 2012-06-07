@@ -22,7 +22,7 @@ module Dumper
     def initialize(options = {})
       log 'app_key is missing' if options[:app_key].blank?
 
-      @stack = Dumper::Stack.new
+      @stack = Dumper::Stack.new(options)
       @api_base = options[:api_base] || 'http://dumper.io'
       @app_key = options[:app_key]
       @app_env = @stack.rails_env

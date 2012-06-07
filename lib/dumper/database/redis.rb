@@ -6,7 +6,7 @@ module Dumper
 
       def command
         uncompressed = filename.sub('.gz','')
-        "cd #{tmpdir} && cp #{@stack.configs[:redis][:dbpath]} #{uncompressed} && gzip #{uncompressed}"
+        "cd #{tmpdir} && cp #{@config.dbpath} #{uncompressed} && gzip #{uncompressed}"
       end
 
       def config_for(rails_env=nil)

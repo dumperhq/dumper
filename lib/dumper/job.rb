@@ -1,3 +1,4 @@
+require 'ostruct'
 require 'posix/spawn'
 
 module Dumper
@@ -25,15 +26,12 @@ module Dumper
 
     def perform(server)
       # Initialize database
-      case server[:type]
-      when 'mysql'
-        @database = Dumper::Database::MySQL.new(@stack)
-      when 'mongodb'
-        @database = Dumper::Database::MongoDB.new(@stack)
-      when 'redis'
-        @database = Dumper::Database::Redis.new(@stack)
+      server_type = server[:type].to_sym
+      if Dumper::Stack::DATABASES.keys.include?(server_type)
+        @database = Dumper::Stack::DATABASES[server_type].new(@stack)
+        @database.config = OpenStruct.new(@stack.configs[Dumper::Stack::DATABASES.key(@database.class)])
       else
-        abort_with "invalid server type: #{server[:type]}"
+        abort_with "invalid server type: #{server_type}"
       end
 
       # Prepare

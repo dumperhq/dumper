@@ -10,9 +10,10 @@ module Dumper
   autoload :VERSION,    'dumper/version'
 
   module Database
-    autoload :Base,     'dumper/database/base'
-    autoload :MySQL,    'dumper/database/mysql'
-    autoload :MongoDB,  'dumper/database/mongodb'
-    autoload :Redis,    'dumper/database/redis'
+    autoload :Base,       'dumper/database/base'
+    autoload :MySQL,      'dumper/database/mysql'
+    autoload :PostgreSQL, 'dumper/database/postgresql'
+    autoload :MongoDB,    'dumper/database/mongodb'
+    autoload :Redis,      'dumper/database/redis'
   end
 end

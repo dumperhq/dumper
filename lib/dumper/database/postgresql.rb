@@ -1,29 +1,29 @@
 module Dumper
   module Database
-    class MySQL < Base
-      DUMP_TOOL = 'mysqldump'
+    class PostgreSQL < Base
+      DUMP_TOOL = 'pg_dump'
       FILE_EXT = 'sql.gz'
 
       def command
-        "cd #{tmpdir} && #{dump_tool_path} #{connection_options} #{additional_options} #{@config.database} | gzip > #{filename}"
+        "cd #{tmpdir} && #{password_variable} #{dump_tool_path} #{connection_options} #{@config.database} | gzip > #{filename}"
       end
 
       def connection_options
-        [ :host, :port, :username, :password ].map do |option|
+        [ :host, :port, :socket ].map do |option|
           next if @config.send(option).blank?
-          "--#{option}='#{@config.send(option)}'".gsub('--username', '--user')
+          "--#{option}='#{@config.send(option)}'".gsub('--socket', '--host')
         end.compact.join(' ')
       end
 
-      def additional_options
-        '--single-transaction'
+      def password_variable
+        @config.password.blank? ? '' : "PGPASSWORD='#{@config.password}'"
       end
 
       def config_for(rails_env=nil)
         return unless defined?(ActiveRecord::Base) &&
           ActiveRecord::Base.configurations &&
           (config = ActiveRecord::Base.configurations[rails_env]) &&
-          %w(mysql mysql2).include?(config['adapter'])
+          (config['adapter'] == 'postgresql')
 
         {
           :host => config['host'],

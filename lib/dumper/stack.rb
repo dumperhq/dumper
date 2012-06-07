@@ -3,14 +3,15 @@ module Dumper
     include Dumper::Utility::ObjectFinder
 
     DATABASES = {
-      :mysql => Dumper::Database::MySQL,
-      :mongodb => Dumper::Database::MongoDB,
-      :redis => Dumper::Database::Redis,
+      :mysql      =>  Dumper::Database::MySQL,
+      :postgresql =>  Dumper::Database::PostgreSQL,
+      :mongodb    =>  Dumper::Database::MongoDB,
+      :redis      =>  Dumper::Database::Redis,
     }
 
     attr_accessor :rails_env, :dispatcher, :framework, :rackup, :configs
 
-    def initialize
+    def initialize(options = {})
       @configs = {}
 
       # Rackup?
@@ -23,7 +24,8 @@ module Dumper
         @rails_version = Rails::VERSION::STRING
         @is_supported_rails_version = (::Rails::VERSION::MAJOR >= 3)
         DATABASES.each do |key, klass|
-          next unless config = klass.new.config_for(@rails_env)
+          database = klass.new
+          next unless config = database.config_for(@rails_env) || database.config_for(options[:additional_env])
           @configs[key] = config
         end
 

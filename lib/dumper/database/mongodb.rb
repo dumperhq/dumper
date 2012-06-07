@@ -10,8 +10,8 @@ module Dumper
 
       def connection_options
         [ :database, :host, :port, :username, :password ].map do |option|
-          next if @stack.configs[:mongodb][option].blank?
-          "--#{option}='#{@stack.configs[:mongodb][option]}'".gsub('--database', '--db')
+          next if @config.send(option).blank?
+          "--#{option}='#{@config.send(option)}'".gsub('--database', '--db')
         end.compact.join(' ')
       end
 
