@@ -9,11 +9,10 @@ Dumper is a backup management system that offers a whole new way to take daily b
 * Ruby 1.8.7 , Ruby 1.9.2 or later
 * Rails 3.0 or later
 * MySQL with ActiveRecord
+* PostgreSQL with ActiveRecord
 * MongoDB with the mongo gem (including Mongoid 2.x)
-* Redis with the redis gem **To take backups from Redis, you must run agent on the Redis host**
-* Runs inside [thin](http://code.macournoyer.com/thin/), [unicorn](http://unicorn.bogomips.org/), [passenger](http://www.modrails.com/) or [resque](https://github.com/defunkt/resque) (mongrel and webrick are also supported for development)
-
-Support for PostgreSQL is coming soon.
+* Redis with the redis gem - **limitation: you must run agent on the Redis host**
+* Agent runs inside [thin](http://code.macournoyer.com/thin/), [unicorn](http://unicorn.bogomips.org/), [passenger](http://www.modrails.com/) or [resque](https://github.com/defunkt/resque) (mongrel and webrick are also supported for development)
 
 ## Installation
 
