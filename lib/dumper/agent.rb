@@ -11,7 +11,15 @@ module Dumper
 
     class << self
       def start(options = {})
-        new(options).start
+        if defined?(Rails::Railtie)
+          ActiveSupport.on_load :after_initialize do
+            # Since the first Redis object could be instantiated after our initializer gets run,
+            # we start the agent after all initializers are loaded.
+            Dumper::Agent.new(options).start
+          end
+        else
+          new(options).start
+        end
       end
 
       def start_if(options = {})
@@ -23,7 +31,7 @@ module Dumper
       log 'app_key is missing' if options[:app_key].blank?
 
       @stack = Dumper::Stack.new(options)
-      @api_base = options[:api_base] || 'http://dumper.io'
+      @api_base = options[:api_base] || 'https://dumper.io'
       @app_key = options[:app_key]
       @app_env = @stack.rails_env
       @app_name = ObjectSpace.each_object(Rails::Application).first.class.name.split("::").first
@@ -40,11 +48,13 @@ module Dumper
 
     def start_loop
       sec = 1
+      register_body = MultiJson.dump(register_hash)
+      log "message body for agent/register: #{register_body}", :debug
       begin
         sec *= 2
         log "sleeping #{sec} seconds for agent/register", :debug
         sleep sec
-        json = api_request('agent/register', :json => MultiJson.dump(register_hash))
+        json = api_request('agent/register', :json => register_body)
       end until json[:status]
 
       return log("agent stopped: #{json.to_s}") if json[:status] == 'error'
