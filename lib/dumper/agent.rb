@@ -69,9 +69,11 @@ module Dumper
         if json[:status] == 'ok'
           # Promoted or demoted?
           if json[:token]
-            @token = json[:token] # promote
+            log 'promoted to primary' if @token.nil?
+            @token = json[:token]
           else
-            @token = nil # demote
+            log 'demoted to secondary' if @token
+            @token = nil
           end
 
           if json[:job]
