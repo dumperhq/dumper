@@ -55,11 +55,11 @@ module Dumper
 
     module LoggingMethods
       def logger
-        @logger ||= Dumper::Utility::SlimLogger.new("#{Rails.root}/log/dumper_agent.log", 1, 10.megabytes)
+        @@logger ||= Dumper::Utility::SlimLogger.new("#{Rails.root}/log/dumper_agent.log", 1, 10.megabytes)
       end
 
       def stdout_logger
-        @stdout_logger ||= Dumper::Utility::SlimLogger.new(STDOUT)
+        @@stdout_logger ||= Dumper::Utility::SlimLogger.new(STDOUT)
       end
 
       def log(msg, level=:info)
@@ -70,6 +70,7 @@ module Dumper
 
       def log_last_error
         log [ $!.class.name, $!.to_s ].join(', ')
+        log ("\n" << $!.backtrace.join("\n")), :debug
       end
     end
 

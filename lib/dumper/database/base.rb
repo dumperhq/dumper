@@ -31,7 +31,7 @@ module Dumper
       end
 
       def finalize
-        FileUtils.remove_entry_secure tmpdir if File.exist? tmpdir
+        FileUtils.remove_entry_secure(tmpdir) if tmpdir and File.exist?(tmpdir)
       end
     end
   end
