@@ -5,10 +5,6 @@ module Dumper
 
       attr_accessor :tmpdir, :filename, :config
 
-      def initialize(stack = nil)
-        @stack = stack
-      end
-
       def file_ext
         self.class::FILE_EXT
       end

@@ -10,7 +10,6 @@ module Dumper
 
     def initialize(agent, job)
       @agent = agent
-      @stack = agent.stack
       @job = job
     end
 
