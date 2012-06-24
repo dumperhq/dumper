@@ -10,8 +10,8 @@ module Dumper
 
       def connection_options
         [ :database, :host, :port, :username, :password ].map do |option|
-          next if @config.send(option).blank?
-          "--#{option}='#{@config.send(option)}'".gsub('--database', '--db')
+          next if @config[option].blank?
+          "--#{option}='#{@config[option]}'".gsub('--database', '--db')
         end.compact.join(' ')
       end
 
@@ -19,11 +19,11 @@ module Dumper
         "--out='#{tmpdir}'"
       end
 
-      def config_for(rails_env=nil)
+      def set_config_for(rails_env=nil)
         return unless defined?(Mongo::DB) &&
           (mongo = find_instance_in_object_space(Mongo::DB))
 
-        {
+        @config = {
           :host => mongo.connection.host,
           :port => mongo.connection.port,
           :database => mongo.name,

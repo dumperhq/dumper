@@ -9,10 +9,10 @@ module Dumper
       :redis      =>  Dumper::Database::Redis,
     }
 
-    attr_accessor :rails_env, :dispatcher, :framework, :rackup, :configs
+    attr_accessor :rails_env, :dispatcher, :framework, :rackup, :databases
 
     def initialize(options = {})
-      @configs = {}
+      @databases = {}
 
       # Rackup?
       @rackup = find_instance_in_object_space(Rack::Server)
@@ -25,8 +25,8 @@ module Dumper
         @is_supported_rails_version = (::Rails::VERSION::MAJOR >= 3)
         DATABASES.each do |key, klass|
           database = klass.new
-          next unless config = database.config_for(@rails_env) || database.config_for(options[:additional_env])
-          @configs[key] = config
+          next unless database.set_config_for(@rails_env) || database.set_config_for(options[:additional_env])
+          @databases[key] = database
         end
 
       else
@@ -45,13 +45,13 @@ module Dumper
         rails_env: @rails_env,
         rails_version: @rails_version,
         dispatcher: @dispatcher,
-        configs: Hash[@configs.map{|k, config| [ k, config.reject{|k,v| k == :password } ] }]
+        configs: Hash[@databases.map{|k, database| [ k, database.config.reject{|k,v| k == :password } ] }]
       }
     end
 
     # Compatibility
     def supported?
-      @is_supported_rails_version && @dispatcher && !@configs.empty?
+      @is_supported_rails_version && @dispatcher && !@databases.empty?
     end
 
     # Dispatcher

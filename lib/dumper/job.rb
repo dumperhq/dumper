@@ -24,14 +24,10 @@ module Dumper
     end
 
     def perform(server)
-      # Initialize database
+      # Find database
       server_type = server[:type].to_sym
-      if Dumper::Stack::DATABASES.keys.include?(server_type)
-        @database = Dumper::Stack::DATABASES[server_type].new(@stack)
-        @database.config = OpenStruct.new(@stack.configs[Dumper::Stack::DATABASES.key(@database.class)])
-      else
-        abort_with "invalid server type: #{server_type}"
-      end
+      abort_with "invalid server type: #{server_type}" unless Dumper::Stack::DATABASES.keys.include?(server_type)
+      return log "database not found: #{@database.inspect}" unless @database = @agent.stack.databases[server_type]
 
       # Prepare
       json = @agent.api_request('backup/prepare', :params => { :server_id => server[:id], :manual => server[:manual].to_s, :ext => @database.file_ext })

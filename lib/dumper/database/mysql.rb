@@ -5,13 +5,13 @@ module Dumper
       FILE_EXT = 'sql.gz'
 
       def command
-        "cd #{tmpdir} && #{dump_tool_path} #{connection_options} #{additional_options} #{@config.database} | gzip > #{filename}"
+        "cd #{tmpdir} && #{dump_tool_path} #{connection_options} #{additional_options} #{@config[:database]} | gzip > #{filename}"
       end
 
       def connection_options
         [ :host, :port, :username, :password ].map do |option|
-          next if @config.send(option).blank?
-          "--#{option}='#{@config.send(option)}'".gsub('--username', '--user')
+          next if @config[option].blank?
+          "--#{option}='#{@config[option]}'".gsub('--username', '--user')
         end.compact.join(' ')
       end
 
@@ -19,13 +19,13 @@ module Dumper
         '--single-transaction'
       end
 
-      def config_for(rails_env=nil)
+      def set_config_for(rails_env=nil)
         return unless defined?(ActiveRecord::Base) &&
           ActiveRecord::Base.configurations &&
           (config = ActiveRecord::Base.configurations[rails_env]) &&
           %w(mysql mysql2).include?(config['adapter'])
 
-        {
+        @config = {
           :host => config['host'],
           :port => config['port'],
           :username => config['username'],
