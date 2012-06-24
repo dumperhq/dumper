@@ -6,8 +6,6 @@ module Dumper
     include POSIX::Spawn
     include Dumper::Utility::LoggingMethods
 
-    MAX_FILESIZE = 4.gigabytes
-
     def initialize(agent, job)
       @agent = agent
       @job = job
@@ -56,7 +54,7 @@ module Dumper
 
       dump_duration = Time.now - start_at
       log "dump_duration = #{dump_duration}"
-      if (filesize = File.size(@database.dump_path)) > MAX_FILESIZE
+      if (filesize = File.size(@database.dump_path)) > @agent.max_filesize
         abort_with("max filesize exceeded: #{filesize}", :too_large)
       end
 

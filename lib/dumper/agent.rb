@@ -6,8 +6,9 @@ module Dumper
     include Dumper::Utility::LoggingMethods
 
     API_VERSION = 1
+    MAX_FILESIZE = 2.gigabytes
 
-    attr_reader :stack
+    attr_reader :stack, :max_filesize
 
     class << self
       def start(options = {})
@@ -60,7 +61,9 @@ module Dumper
       return log("agent stopped: #{json.to_s}") if json[:status] == 'error'
 
       @token = json[:token]
-      log "agent started as #{@token ? 'primary' : 'secondary'}"
+      @max_filesize = (json[:max_filesize] || MAX_FILESIZE).to_i
+      log "agent started as #{@token ? 'primary' : 'secondary'}, max_filesize = #{@max_filesize}"
+
       sleep 1.hour + rand(10) unless @token
 
       loop do
