@@ -1,12 +1,10 @@
 # Dumper Agent for Rails
 
-Dumper is a backup management system that offers a whole new way to take daily backups of your databases.
-
-**This app will be launched soon!**
+[Dumper](http://dumper.io/) is a backup management system that offers a whole new way to perform automated backups of your databases.
 
 ## Supported Stacks
 
-* Ruby 1.8.7 , Ruby 1.9.2 or later
+* Ruby 1.8.7, Ruby 1.9.2 or later
 * Rails 3.0 or later
 * MySQL with ActiveRecord
 * PostgreSQL with ActiveRecord
