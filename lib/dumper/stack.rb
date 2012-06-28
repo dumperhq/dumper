@@ -23,6 +23,11 @@ module Dumper
         @rails_env = Rails.env.to_s
         @rails_version = Rails::VERSION::STRING
         @is_supported_rails_version = (::Rails::VERSION::MAJOR >= 3)
+
+        if defined?(MongoMapper)
+          MongoMapper.database # Creates the Mongo::DB instance
+        end
+
         DATABASES.each do |key, klass|
           database = klass.new
           next unless database.set_config_for(@rails_env) || database.set_config_for(options[:additional_env])
