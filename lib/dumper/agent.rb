@@ -6,7 +6,7 @@ module Dumper
     include Dumper::Utility::LoggingMethods
 
     API_VERSION = 1
-    MAX_FILESIZE = 2.gigabytes
+    MAX_FILESIZE = 2147483648 # 2.gigabytes
 
     attr_reader :stack, :max_filesize
 

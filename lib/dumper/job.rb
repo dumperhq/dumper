@@ -44,6 +44,8 @@ module Dumper
       begin
         pid, stdin, stdout, stderr = popen4(@database.command)
         stdin.close
+        (out = stdout.read).empty? or log out, :debug
+        (err = stderr.read).empty? or log err, :error
       rescue
         Process.kill(:INT, pid) rescue SystemCallError
         abort_with("dump error: #{$!}", :dump_error)
