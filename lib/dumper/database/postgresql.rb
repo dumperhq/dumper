@@ -9,7 +9,7 @@ module Dumper
       end
 
       def connection_options
-        [ :host, :port, :socket ].map do |option|
+        [ :host, :port, :socket, :username ].map do |option|
           next if @config[option].blank?
           "--#{option}='#{@config[option]}'".gsub('--socket', '--host')
         end.compact.join(' ')
