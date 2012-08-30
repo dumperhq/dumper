@@ -15,7 +15,7 @@ module Dumper
       @databases = {}
 
       # Rackup?
-      @rackup = find_instance_in_object_space(Rack::Server)
+      @rackup = defined?(Rack::Server) && find_instance_in_object_space(Rack::Server)
 
       # Rails?
       if defined?(::Rails)
@@ -23,19 +23,18 @@ module Dumper
         @rails_env = Rails.env.to_s
         @rails_version = Rails::VERSION::STRING
         @is_supported_rails_version = (::Rails::VERSION::MAJOR >= 3)
-
-        if defined?(MongoMapper)
-          MongoMapper.database # Creates the Mongo::DB instance
-        end
-
-        DATABASES.each do |key, klass|
-          database = klass.new
-          next unless database.set_config_for(@rails_env) || database.set_config_for(options[:additional_env])
-          @databases[key] = database
-        end
-
       else
         @framework = :ruby
+      end
+
+      if defined?(MongoMapper)
+        MongoMapper.database # Trigger to create a Mongo::DB instance
+      end
+
+      DATABASES.each do |key, klass|
+        database = klass.new
+        next unless database.set_config_for(@rails_env) || database.set_config_for(options[:additional_env])
+        @databases[key] = database
       end
 
       # Which dispatcher?

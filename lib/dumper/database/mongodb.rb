@@ -21,15 +21,17 @@ module Dumper
 
       def set_config_for(rails_env=nil)
         return unless defined?(Mongo::DB) &&
-          (mongo = find_instance_in_object_space(Mongo::DB))
+          (mongo = find_instance_in_object_space(Mongo::DB)) ||
+          defined?(Mongoid) && Mongoid::Config.respond_to?(:sessions) &&
+          (mongoid = Mongoid::Config.sessions[:default])
 
         @config = {
-          :host => mongo.connection.host,
-          :port => mongo.connection.port,
-          :database => mongo.name,
+          :host => mongo ? mongo.connection.host : mongoid[:hosts].first.split(/:/).first,
+          :port => mongo ? mongo.connection.port : mongoid[:hosts].first.split(/:/).last,
+          :database => mongo ? mongo.name : mongoid[:database],
           :dump_tool => dump_tool_path
         }.tap do |h|
-          if auth = mongo.connection.auths.first
+          if auth = mongo ? mongo.connection.auths.first : mongoid
             h.update(:username => auth['username'], :password => auth['password'])
           end
         end
