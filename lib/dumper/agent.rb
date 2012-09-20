@@ -40,8 +40,8 @@ module Dumper
     end
 
     def start
+      log "stack: #{@stack.to_hash}", :debug
       return unless @stack.supported?
-      log "stack: dispatcher = #{@stack.dispatcher}, framework = #{@stack.framework}, rackup = #{@stack.rackup}"
 
       @loop_thread = Thread.new { start_loop }
       @loop_thread[:name] = 'Loop Thread'

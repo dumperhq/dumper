@@ -65,3 +65,13 @@ end
 ```
 
 If you are using resque, it's a good idea to run it on the same host with Redis, and start the agent on the resque instance.
+
+## Debugging
+
+If the agent doesn't seem to work, pass `Logger::DEBUG` to the `loglevel` option.
+
+```ruby
+Dumper::Agent.start(app_key: '...', loglevel: Logger::DEBUG)
+```
+
+It gives verbose logging that helps us to understand the problem.
