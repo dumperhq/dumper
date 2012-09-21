@@ -1,5 +1,6 @@
 require 'timeout'
 require 'net/http'
+require 'multi_json' # necessary for Rails 3.0.x!
 
 module Dumper
   class Agent
@@ -36,11 +37,14 @@ module Dumper
       @app_key = options[:app_key]
       @app_env = @stack.rails_env
       @app_name = ObjectSpace.each_object(Rails::Application).first.class.name.split("::").first
-      logger.level = stdout_logger.level = options[:loglevel] if options[:loglevel]
+      if options[:debug]
+        logger.level = stdout_logger.level = Logger::DEBUG
+        Thread.abort_on_exception = true
+      end
     end
 
     def start
-      log "stack: #{@stack.to_hash}", :debug
+      log "stack: #{@stack.to_hash} - supported: #{@stack.supported?}", :debug
       return unless @stack.supported?
 
       @loop_thread = Thread.new { start_loop }

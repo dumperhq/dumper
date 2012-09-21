@@ -8,7 +8,7 @@
 * Rails 3.0 or later
 * MySQL with ActiveRecord
 * PostgreSQL with ActiveRecord
-* MongoDB with the mongo gem (including Mongoid 2.x)
+* MongoDB with Mongoid or MongoMapper
 * Redis with the redis gem - **limitation: you must run agent on the Redis host**
 * Agent runs inside [thin](http://code.macournoyer.com/thin/), [unicorn](http://unicorn.bogomips.org/), [passenger](http://www.modrails.com/) or [resque](https://github.com/defunkt/resque) (mongrel and webrick are also supported for development)
 
@@ -68,10 +68,10 @@ If you are using resque, it's a good idea to run it on the same host with Redis,
 
 ## Debugging
 
-If the agent doesn't seem to work, pass `Logger::DEBUG` to the `loglevel` option.
+If the agent doesn't seem to work, pass `true` to the `debug` option.
 
 ```ruby
-Dumper::Agent.start(app_key: '...', loglevel: Logger::DEBUG)
+Dumper::Agent.start(app_key: 'YOUR_APP_KEY', debug: true)
 ```
 
 It gives verbose logging that helps us to understand the problem.
