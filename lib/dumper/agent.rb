@@ -1,6 +1,6 @@
 require 'timeout'
 require 'net/http'
-require 'multi_json' # necessary for Rails 3.0.x!
+require 'dumper/patch'
 
 module Dumper
   class Agent
