@@ -80,7 +80,17 @@ module Dumper
         http.use_ssl = true
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       end
-      response = http.request(request)
+
+      retry_count = 0
+      begin
+        response = http.request(request)
+      rescue Errno::ECONNRESET
+        raise if retry_count > 3
+        retry_count += 1
+        log "upload failed: #{$!} - retrying..."
+        retry
+      end
+
       log "response from S3 = #{response.to_s}"
       response
     rescue
