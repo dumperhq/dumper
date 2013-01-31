@@ -84,7 +84,7 @@ module Dumper
       retry_count = 0
       begin
         response = http.request(request)
-      rescue Errno::ECONNRESET
+      rescue # Errno::ECONNRESET, Errno::EPIPE, etc.
         raise if retry_count > 3
         retry_count += 1
         log "upload failed: #{$!} - retrying..."
@@ -94,7 +94,7 @@ module Dumper
       log "response from S3 = #{response.to_s}"
       response
     rescue
-      log_last_error
+      abort_with("upload error: #{$!}", :upload_error)
     end
 
     def abort_with(text, code=nil)
@@ -103,6 +103,7 @@ module Dumper
       if code
         @agent.api_request('backup/fail', :params => { :backup_id => @backup_id, :code => code.to_s, :message => text })
       end
+      log 'aborting...'
       exit!
     end
   end
