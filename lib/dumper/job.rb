@@ -85,9 +85,11 @@ module Dumper
       begin
         response = http.request(request)
       rescue # Errno::ECONNRESET, Errno::EPIPE, etc.
-        raise if retry_count > 3
+        raise if retry_count > 8
         retry_count += 1
-        log "upload failed: #{$!} - retrying..."
+        fields['file'].rewind
+        log "upload failed: #{$!} - retrying after #{2 ** retry_count}sec..."
+        sleep 2 ** retry_count
         retry
       end
 
