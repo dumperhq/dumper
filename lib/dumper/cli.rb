@@ -1,5 +1,6 @@
 Dumper::Dependency.load('thor')
 Dumper::Dependency.load('rainbow')
+Dumper::Dependency.load('net-ntp')
 
 module Dumper
   class Cli < Thor
@@ -9,23 +10,23 @@ module Dumper
     def doctor
       check_ip
       check_cnf
+      check_clock
     end
 
     no_tasks do
       def check_ip
-        puts 'Checking IP address...'
+        print 'Checking IP address... '
         @ip = Dumper::Utility::IP.new
-        str = "#{@ip.ip} ... "
+        print "#{@ip.ip} => "
         if @ip.ipaddr.private?
-          str << 'private'.color(:red)
+          puts "private IP, #{fetch_will_fail_warning}".color(:red)
         else
-          str << 'public'.color(:green)
+          puts 'public IP, good'.color(:green)
         end
-        puts str
       end
 
       def check_cnf
-        puts 'Checking my.cnf...'
+        print 'Checking my.cnf... '
         bound = nil
         ['/etc/my.cnf', '/etc/mysql/my.cnf', '/usr/etc/my.cnf', '~/.my.cnf'].each do |name|
           fullpath = File.expand_path(name)
@@ -39,13 +40,31 @@ module Dumper
         end
         if bound
           if bound == '127.0.0.1'
-            puts 'There is bind-address = 127.0.0.1 ... ' << 'fail'.color(:red)
+            print 'There is bind-address = 127.0.0.1 => '
           elsif IPAddr.new(bound).private?
-            puts "There is bind-address = #{bound} ... " << 'fail'.color(:red)
+            print "There is bind-address = #{bound} => "
           end
+          puts fetch_will_fail_warning.color(:red)
         else
-          puts 'No bind-address defined in my.cnf ... ' << 'ok'.color(:green)
+          puts 'No bind-address defined in my.cnf => ' << 'good'.color(:green)
         end
+      end
+
+      def check_clock
+        print 'Checking server clock accuracy... '
+        target = Net::NTP.get('us.pool.ntp.org').time
+        source = Time.now
+        diff = (target - source).abs.round(3)
+        print "#{source.strftime('%Y-%m-%d %H:%M:%S')} (server time) vs #{target.strftime('%Y-%m-%d %H:%M:%S')} (ntp time), diff: #{diff} seconds => "
+        if diff > 15 * 60
+          puts 'warning, Amazon S3 does not accept clock skewed more than 15 minutes.'.color(:red)
+        else
+          puts 'good'.color(:green)
+        end
+      end
+
+      def fetch_will_fail_warning
+        'warning - fetch from dumper.io to this server will fail, you will need to use the dumper gem with rails.'
       end
     end
   end

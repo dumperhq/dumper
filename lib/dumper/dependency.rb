@@ -1,8 +1,9 @@
 module Dumper
   class Dependency
     LIBS = {
-      'thor' =>       { :require => 'thor',       :version => '~> 0.14.0' },
+      'thor' =>       { :require => 'thor',       :version => '~> 0.14' },
       'rainbow' =>    { :require => 'rainbow',    :version => '~> 1.1.4' },
+      'net-ntp' =>    { :require => 'net/ntp',    :version => '~> 2.1.1' },
     }
 
     def self.load(name)
