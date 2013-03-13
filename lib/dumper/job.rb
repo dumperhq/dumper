@@ -55,8 +55,9 @@ module Dumper
       end
 
       dump_duration = Time.now - start_at
-      log "dump_duration = #{dump_duration}"
-      if (filesize = File.size(@database.dump_path)) > @agent.max_filesize
+      filesize = File.size(@database.dump_path)
+      log "dump_duration = #{dump_duration}, filesize = #{filesize}"
+      if filesize > @agent.max_filesize
         abort_with("max filesize exceeded: #{filesize}", :too_large)
       end
 
