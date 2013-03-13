@@ -93,8 +93,15 @@ module Dumper
         retry
       end
 
-      log "response from S3 = #{response.to_s}"
-      response
+      log "response from S3 = #{response.to_s} - #{response.body}"
+
+      # http://apidock.com/ruby/Net/HTTPResponse
+      case response
+      when Net::HTTPSuccess
+        true
+      else
+        abort_with("upload error: #{response.to_s} - #{response.body}", :upload_error)
+      end
     rescue
       abort_with("upload error: #{$!}", :upload_error)
     end
