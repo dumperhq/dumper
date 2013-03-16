@@ -7,6 +7,23 @@ describe Dumper do
     Dumper::Agent.respond_to?(:start).should be_true
   end
 
+  it 'loads everything' do
+    expect {
+      Dumper::Agent
+      # Dumper::Cli
+      Dumper::Dependency
+      Dumper::Job
+      Dumper::Stack
+      Dumper::Utility
+      Dumper::VERSION
+      Dumper::Database::Base
+      Dumper::Database::MySQL
+      Dumper::Database::PostgreSQL
+      Dumper::Database::MongoDB
+      Dumper::Database::Redis
+    }.to_not raise_error
+  end
+
   describe :Stack do
     it 'initializes stack' do
       stack = Dumper::Stack.new

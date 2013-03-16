@@ -55,13 +55,13 @@ module Dumper
       end
 
       dump_duration = Time.now - start_at
-      filesize = File.size(@database.dump_path)
-      log "dump_duration = #{dump_duration}, filesize = #{filesize}"
-      if filesize > @agent.max_filesize
-        abort_with("max filesize exceeded: #{filesize}", :too_large)
+      @filesize = File.size(@database.dump_path)
+      log "dump_duration = #{dump_duration}, filesize = #{@filesize}"
+      if @filesize > @agent.max_filesize
+        abort_with("max filesize exceeded: #{@filesize}", :too_large)
       end
 
-      upload_to_s3(json[:url], json[:fields])
+      upload_to_s3(json)
 
       json = @agent.api_request('backup/commit', :params => { :backup_id => @backup_id, :dump_duration => dump_duration.to_i })
     rescue
@@ -71,10 +71,37 @@ module Dumper
     end
 
     # Upload
-    def upload_to_s3(url, fields)
+    def upload_to_s3(json)
+      if defined?(AWS::S3::MultipartUpload) and @filesize > 100.megabytes
+        # aws-sdk gem installed
+        upload_by_aws_sdk(json)
+      else
+        # fallback to multipart-post
+        upload_by_multipart_post(json)
+      end
+    rescue
+      abort_with("upload error: #{$!} - please contact our support.", :upload_error)
+    end
+
+    def upload_by_aws_sdk(json)
+      log "uploading by aws-sdk v#{AWS::VERSION}"
+
+      s3 = json[:s3_federation]
+      aws = AWS::S3.new(s3[:credentials])
+      aws.buckets[s3[:bucket]].objects[s3[:key]].write(
+        file: @database.dump_path,
+        content_type: 'application/octet-stream',
+        content_disposition: "attachment; filename=#{@database.filename}",
+      )
+    end
+
+    def upload_by_multipart_post(json)
       require 'net/http/post/multipart'
+      log "uploading by multipart-post v#{Gem.loaded_specs['multipart-post'].version.to_s}"
+
+      fields = json[:fields]
       fields['file'] = UploadIO.new(@database.dump_path, 'application/octet-stream', @database.filename)
-      uri = URI.parse(url)
+      uri = URI.parse(json[:url])
       request = Net::HTTP::Post::Multipart.new uri.path, fields
       http = Net::HTTP.new(uri.host, uri.port)
       if uri.is_a? URI::HTTPS
@@ -103,8 +130,6 @@ module Dumper
       else
         abort_with("upload error: #{response.to_s} - #{response.body}", :upload_error)
       end
-    rescue
-      abort_with("upload error: #{$!}", :upload_error)
     end
 
     def abort_with(text, code=nil)
