@@ -20,6 +20,13 @@ Add the following line to your Rails project Gemfile:
 gem 'dumper'
 ```
 
+If your database is larger than 300MB, it is recommended to also include `aws-sdk` gem for maximum stability.
+
+```ruby
+gem 'aws-sdk', '>= 1.8.1.2'
+gem 'dumper'
+```
+
 then create `config/initializers/dumper.rb` and add the following line:
 
 ```ruby
