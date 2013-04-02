@@ -38,7 +38,7 @@ module Dumper
       end
 
       # Which dispatcher?
-      [ :unicorn, :passenger, :thin, :mongrel, :webrick, :resque ].find do |name|
+      [ :unicorn, :passenger, :thin, :mongrel, :webrick, :pow, :resque ].find do |name|
         @dispatcher = send("#{name}?") ? name : nil
       end
     end
@@ -80,6 +80,11 @@ module Dumper
     def webrick?
       # defined?(::WEBrick::VERSION)
       @rackup and @rackup.server.to_s.demodulize == 'WEBrick'
+    end
+
+    def pow?
+      # https://github.com/josh/nack/blob/master/bin/nack_worker
+      defined?(::Nack::Server) && find_instance_in_object_space(::Nack::Server)
     end
 
     def resque?
