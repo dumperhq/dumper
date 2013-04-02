@@ -23,7 +23,7 @@ module Dumper
         return unless defined?(ActiveRecord::Base) &&
           ActiveRecord::Base.configurations &&
           (config = ActiveRecord::Base.configurations[rails_env]) &&
-          %w(mysql mysql2).include?(config['adapter'])
+          %w(mysql mysql2 mysql2spatial).include?(config['adapter'])
 
         @config = {
           :host => config['host'],
