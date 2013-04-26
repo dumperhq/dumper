@@ -88,11 +88,21 @@ module Dumper
 
       s3 = json[:s3_federation]
       aws = AWS::S3.new(s3[:credentials])
-      aws.buckets[s3[:bucket]].objects[s3[:key]].write(
-        file: @database.dump_path,
-        content_type: 'application/octet-stream',
-        content_disposition: "attachment; filename=#{@database.filename}",
-      )
+
+      retry_count = 0
+      begin
+        aws.buckets[s3[:bucket]].objects[s3[:key]].write(
+          file: @database.dump_path,
+          content_type: 'application/octet-stream',
+          content_disposition: "attachment; filename=#{@database.filename}",
+        )
+      rescue # Errno::ECONNRESET, Errno::EPIPE, etc.
+        raise if retry_count > 8
+        retry_count += 1
+        log "upload failed: #{$!} - retrying after #{2 ** retry_count}sec..."
+        sleep 2 ** retry_count
+        retry
+      end
     end
 
     def upload_by_multipart_post(json)
