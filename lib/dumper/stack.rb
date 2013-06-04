@@ -64,7 +64,7 @@ module Dumper
     end
 
     def passenger?
-      defined?(::Passenger::AbstractServer) || defined?(::IN_PHUSION_PASSENGER)
+      defined?(::PhusionPassenger) || defined?(::Passenger::AbstractServer) || defined?(::IN_PHUSION_PASSENGER)
     end
 
     def thin?
