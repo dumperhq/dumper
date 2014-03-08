@@ -4,13 +4,13 @@
 
 ## Supported Stacks
 
-* Ruby 1.8.7, Ruby 1.9.2 or later
+* Ruby 1.8.7 or later
 * Rails 3.0 or later
 * MySQL with ActiveRecord
 * PostgreSQL with ActiveRecord
 * MongoDB with Mongoid or MongoMapper
 * Redis with the redis gem - **limitation: you must run agent on the Redis host**
-* Agent runs inside [thin](http://code.macournoyer.com/thin/), [unicorn](http://unicorn.bogomips.org/), [passenger](http://www.modrails.com/) or [resque](https://github.com/defunkt/resque) (mongrel and webrick are also supported for development)
+* Agent runs inside [thin](http://code.macournoyer.com/thin/), [unicorn](http://unicorn.bogomips.org/), [passenger](http://www.modrails.com/), [puma](http://puma.io) or [resque](https://github.com/defunkt/resque) (mongrel and webrick are also supported for development)
 
 ## Installation
 
