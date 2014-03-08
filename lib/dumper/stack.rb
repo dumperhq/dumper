@@ -38,7 +38,7 @@ module Dumper
       end
 
       # Which dispatcher?
-      [ :unicorn, :passenger, :thin, :mongrel, :webrick, :pow, :resque ].find do |name|
+      [ :puma, :unicorn, :passenger, :thin, :mongrel, :webrick, :pow, :resque ].find do |name|
         @dispatcher = send("#{name}?") ? name : nil
       end
     end
@@ -59,6 +59,11 @@ module Dumper
     end
 
     # Dispatcher
+    def puma?
+      defined?(::Puma::Server) && find_instance_in_object_space(::Puma::Server) ||
+        (@rackup && @rackup.server.to_s.demodulize == 'Puma')
+    end
+
     def unicorn?
       defined?(::Unicorn::HttpServer) && find_instance_in_object_space(::Unicorn::HttpServer)
     end
