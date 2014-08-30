@@ -2,10 +2,10 @@ module Dumper
   module Database
     class MySQL < Base
       DUMP_TOOL = 'mysqldump'
-      FILE_EXT = 'sql.gz'
+      FORMAT = 'sql'
 
       def command
-        "cd #{tmpdir} && #{dump_tool_path} #{connection_options} #{additional_options} #{@config[:database]} | gzip > #{filename}"
+        "cd #{tmpdir} && #{dump_tool_path} #{connection_options} #{additional_options} #{custom_options} #{@config[:database]} | gzip > #{filename}"
       end
 
       def connection_options

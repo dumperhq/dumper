@@ -82,3 +82,17 @@ Dumper::Agent.start(app_key: 'YOUR_APP_KEY', debug: true)
 ```
 
 It gives verbose logging that helps us to understand the problem.
+
+## Custom Options
+
+You can also pass custom dump options, with `custom_options` and `format` for the database type.
+
+```ruby
+Dumper::Agent.start(
+  app_key: 'YOUR_APP_KEY',
+  postgresql: {
+    format: 'dump',
+    custom_options: '-Fc --no-acl --no-owner'
+  }
+)
+```

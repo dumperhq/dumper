@@ -2,7 +2,7 @@ module Dumper
   module Database
     class Redis < Base
       DUMP_TOOL = 'redis-cli'
-      FILE_EXT = 'rdb.gz'
+      FORMAT = 'rdb'
 
       def command
         uncompressed = filename.sub('.gz','')

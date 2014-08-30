@@ -2,10 +2,10 @@ module Dumper
   module Database
     class PostgreSQL < Base
       DUMP_TOOL = 'pg_dump'
-      FILE_EXT = 'sql.gz'
+      FORMAT = 'sql'
 
       def command
-        "cd #{tmpdir} && #{password_variable} #{dump_tool_path} #{connection_options} #{@config[:database]} | gzip > #{filename}"
+        "cd #{tmpdir} && #{password_variable} #{dump_tool_path} #{connection_options} #{custom_options} #{@config[:database]} | gzip > #{filename}"
       end
 
       def connection_options

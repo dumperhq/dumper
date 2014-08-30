@@ -2,10 +2,10 @@ module Dumper
   module Database
     class MongoDB < Base
       DUMP_TOOL = 'mongodump'
-      FILE_EXT = 'tar.gz'
+      FORMAT = 'tar'
 
       def command
-        "cd #{tmpdir} && #{dump_tool_path} #{connection_options} #{additional_options} && tar -czf #{filename} --exclude='#{filename}' ."
+        "cd #{tmpdir} && #{dump_tool_path} #{connection_options} #{additional_options} #{custom_options} && tar -czf #{filename} --exclude='#{filename}' ."
       end
 
       def connection_options

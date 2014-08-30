@@ -34,6 +34,10 @@ module Dumper
       DATABASES.each do |key, klass|
         database = klass.new
         next unless database.set_config_for(@rails_env) || database.set_config_for(options[:additional_env])
+        if options[key].is_a?(Hash)
+          database.custom_options = options[key][:custom_options]
+          database.format         = options[key][:format]
+        end
         @databases[key] = database
       end
 
