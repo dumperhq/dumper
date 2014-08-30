@@ -4,7 +4,7 @@ require 'rails'
 
 describe Dumper do
   it 'conforms to public API' do
-    Dumper::Agent.respond_to?(:start).should be_true
+    expect(Dumper::Agent.respond_to?(:start)).to be_truthy
   end
 
   it 'loads everything' do
@@ -27,16 +27,16 @@ describe Dumper do
   describe :Stack do
     it 'initializes stack' do
       stack = Dumper::Stack.new
-      stack.framework.should == :rails
-      stack.rails_env.should == 'development'
+      expect(stack.framework).to eq(:rails)
+      expect(stack.rails_env).to eq('development')
     end
 
-    it 'detects mongoid 3' do
+    it 'detects mongoid' do
       require 'mongoid'
       Mongoid::Config.send :load_configuration, { sessions: { default: { hosts: ['localhost:27017'], database: 'test' } } }
 
       stack = Dumper::Stack.new
-      stack.databases[:mongodb].should_not == nil
+      expect(stack.databases[:mongodb]).not_to eq(nil)
     end
 
     it 'detects mongo_mapper' do
@@ -45,7 +45,7 @@ describe Dumper do
       MongoMapper.database
 
       stack = Dumper::Stack.new
-      stack.databases[:mongodb].should_not == nil
+      expect(stack.databases[:mongodb]).not_to eq(nil)
     end
 
     it 'detects mysql' do
@@ -53,7 +53,7 @@ describe Dumper do
       ActiveRecord::Base.configurations['development'] = { 'adapter' => 'mysql2' }
 
       stack = Dumper::Stack.new
-      stack.databases[:mysql].should_not == nil
+      expect(stack.databases[:mysql]).not_to eq(nil)
     end
 
     it 'detects postgresql' do
@@ -61,7 +61,7 @@ describe Dumper do
       ActiveRecord::Base.configurations['development'] = { 'adapter' => 'postgresql' }
 
       stack = Dumper::Stack.new
-      stack.databases[:postgresql].should_not == nil
+      expect(stack.databases[:postgresql]).not_to eq(nil)
     end
 
     it 'detects redis' do
@@ -69,7 +69,7 @@ describe Dumper do
       redis = Redis.new
 
       stack = Dumper::Stack.new
-      stack.databases[:redis].should_not == nil
+      expect(stack.databases[:redis]).not_to eq(nil)
     end
   end
 end
