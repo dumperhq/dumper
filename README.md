@@ -23,7 +23,7 @@ gem 'dumper'
 If your database is larger than 300MB, it is recommended to also include `aws-sdk` gem for maximum stability.
 
 ```ruby
-gem 'aws-sdk', '>= 1.8.1.2'
+gem 'aws-sdk', '>= 1.8.1.2', '< 2.0'
 gem 'dumper'
 ```
 
