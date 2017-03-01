@@ -87,7 +87,7 @@ module Dumper
       log "uploading by aws-sdk v#{AWS::VERSION}"
 
       s3 = json[:s3_federation]
-      aws = AWS::S3.new(s3[:credentials])
+      aws = AWS::S3.new s3[:credentials].merge(region: s3[:region])
 
       retry_count = 0
       begin
