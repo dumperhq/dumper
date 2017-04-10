@@ -59,12 +59,12 @@ module Dumper
 
     # Compatibility
     def supported?
-      @is_supported_rails_version && @dispatcher && !@databases.empty?
+      @is_supported_rails_version && !!@dispatcher && !@databases.empty?
     end
 
     # Dispatcher
     def puma?
-      defined?(::Puma::Server) && find_instance_in_object_space(::Puma::Server) ||
+      defined?(::Puma::Runner) && find_instance_in_object_space(::Puma::Runner) || # puma 2.3.0 or later
         (@rackup && @rackup.server.to_s.demodulize == 'Puma')
     end
 
