@@ -4,7 +4,7 @@ require 'posix/spawn'
 module Dumper
   class Job
     include POSIX::Spawn
-    include Dumper::Utility::LoggingMethods
+    include Dumper::Utility::Log
 
     def initialize(agent, job)
       @agent = agent

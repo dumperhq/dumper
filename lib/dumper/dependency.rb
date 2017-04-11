@@ -1,15 +1,16 @@
 module Dumper
   class Dependency
     LIBS = {
-      'thor' =>       { :require => 'thor',       :version => '~> 0.14' },
-      'rainbow' =>    { :require => 'rainbow',    :version => '~> 1.1.4' },
-      'net-ntp' =>    { :require => 'net/ntp',    :version => '~> 2.1.1' },
+      'thor'       => { :version => '~> 0.19' },
+      'rainbow'    => { :version => '~> 2.1', :require => 'rainbow/ext/string' },
+      'net-ntp'    => { :version => '~> 2.1', :require => 'net/ntp' },
+      'ipaddress'  => { :version => '~> 0.8.3' },
     }
 
     def self.load(name)
       begin
-        gem(name, LIBS[name][:version])
-        require(LIBS[name][:require])
+        gem name, LIBS[name][:version]
+        require LIBS[name][:require] || name
       rescue LoadError
         abort <<-EOS
 Dependency missing: #{name}

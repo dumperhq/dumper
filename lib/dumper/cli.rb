@@ -16,12 +16,12 @@ module Dumper
     no_tasks do
       def check_ip
         print 'Checking IP address... '
-        @ip = Dumper::Utility::IP.new
-        print "#{@ip.ip} => "
-        if @ip.ipaddr.private?
-          puts "private IP, #{fetch_will_fail_warning}".color(:red)
+        ip = Dumper::Utility::IP.new
+        print "#{ip.address} => "
+        if ip.private?
+          puts "Private IP, #{fetch_will_fail_warning}".color(:red)
         else
-          puts 'public IP, good'.color(:green)
+          puts 'Public IP, good'.color(:green)
         end
       end
 
@@ -64,7 +64,7 @@ module Dumper
       end
 
       def fetch_will_fail_warning
-        'warning - fetch from dumper.io to this server will fail, you will need to use the dumper gem with rails.'
+        'warning - remote fetch from dumper.io to this server will fail. You will need to use the dumper gem with rails.'
       end
     end
   end

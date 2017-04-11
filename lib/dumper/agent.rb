@@ -4,7 +4,7 @@ require 'dumper/patch'
 
 module Dumper
   class Agent
-    include Dumper::Utility::LoggingMethods
+    include Dumper::Utility::Log
 
     API_VERSION = 1
     MAX_FILESIZE = 2147483648 # 2.gigabytes
