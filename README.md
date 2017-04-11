@@ -30,7 +30,13 @@ gem 'dumper'
 then run the installer:
 
 ```ruby
-rails g dumper:install
+rails g dumper:install [YOUR_APP_KEY]
+```
+
+or manually create `config/initializers/dumper.rb` and add the following line:
+
+```ruby
+Dumper::Agent.start(:app_key => 'YOUR_APP_KEY')
 ```
 
 That's it!
