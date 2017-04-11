@@ -27,10 +27,10 @@ gem 'aws-sdk', '>= 1.8.1.2', '< 2.0'
 gem 'dumper'
 ```
 
-then create `config/initializers/dumper.rb` and add the following line:
+then run the installer:
 
 ```ruby
-Dumper::Agent.start(:app_key => 'YOUR_APP_KEY')
+rails g dumper:install
 ```
 
 That's it!
