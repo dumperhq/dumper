@@ -19,9 +19,9 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'multipart-post', '>= 1.1.5'
   gem.add_runtime_dependency 'posix-spawn', '>= 0.3.6'
 
-  gem.add_development_dependency 'mongo_mapper'
-  gem.add_development_dependency 'mongoid'
-  gem.add_development_dependency 'rails'
+  gem.add_development_dependency 'appraisal'
+  gem.add_development_dependency 'mysql2'
+  gem.add_development_dependency 'pg'
   gem.add_development_dependency 'redis'
   gem.add_development_dependency 'rspec'
 

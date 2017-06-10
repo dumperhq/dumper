@@ -1,2 +1,4 @@
-Gemfile.lock
-pkg
+/Gemfile.lock
+/gemfiles/*.gemfile.lock
+/pkg/
+*.log
