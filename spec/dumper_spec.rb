@@ -32,26 +32,17 @@ describe Dumper do
     end
 
     it 'detects mongoid' do
-      if Mongoid::VERSION < '5.0'
-        Mongoid::Config.send :load_configuration, { sessions: { default: { hosts: ['localhost:27017'], database: 'test' } } }
-
-        stack = Dumper::Stack.new
-        expect(stack.databases[:mongodb]).not_to eq(nil)
+      if Mongoid::VERSION >= '5.0'
+        Mongoid.load!(Rails.root.join('config/mongoid5.yml'))
+        # Mongoid::Clients.default # Trigger Mongoid::Clients::Factory.create(:default)
       else
-        # Tentatively disable testing
-        # Mongo::Client.new 'mongodb://localhost:27017'
+        Mongoid.load!(Rails.root.join('config/mongoid4.yml'))
+        # Moped::Session.new(['localhost:27017'])
       end
-    end
 
-    it 'detects mongo_mapper' do
-      if Rails::VERSION::MAJOR == 3
-        require 'mongo_mapper'
-        MongoMapper.setup({ development: { database: 'test' } }, :development)
-        MongoMapper.database
-
-        stack = Dumper::Stack.new
-        expect(stack.databases[:mongodb]).not_to eq(nil)
-      end
+      stack = Dumper::Stack.new
+      expect(stack.databases[:mongodb]).not_to eq(nil)
+      expect(stack.databases[:mongodb].config).to be_present
     end
 
     it 'detects mysql' do
@@ -61,6 +52,7 @@ describe Dumper do
 
       stack = Dumper::Stack.new
       expect(stack.databases[:mysql]).not_to eq(nil)
+      expect(stack.databases[:mysql].config).to be_present
     end
 
     it 'detects postgresql' do
@@ -70,6 +62,7 @@ describe Dumper do
 
       stack = Dumper::Stack.new
       expect(stack.databases[:postgresql]).not_to eq(nil)
+      expect(stack.databases[:postgresql].config).to be_present
     end
 
     it 'detects additional env' do
@@ -79,6 +72,7 @@ describe Dumper do
 
       stack = Dumper::Stack.new(additional_env: 'more_development')
       expect(stack.databases[:postgresql]).not_to eq(nil)
+      expect(stack.databases[:postgresql].config).to be_present
     end
 
     it 'detects redis' do
@@ -87,6 +81,7 @@ describe Dumper do
 
       stack = Dumper::Stack.new
       expect(stack.databases[:redis]).not_to eq(nil)
+      expect(stack.databases[:redis].config).to be_present
     end
   end
 end

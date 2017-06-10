@@ -19,21 +19,18 @@ module Dumper
         "--out='#{tmpdir}'"
       end
 
-      def set_config_for(rails_env=nil)
-        return unless defined?(Mongo::DB) &&
-          (mongo = find_instance_in_object_space(Mongo::DB)) ||
-          defined?(Mongoid) && Mongoid::Config.respond_to?(:sessions) &&
-          (mongoid = Mongoid::Config.sessions[:default])
+      def set_config
+        config = Dumper::Config::MongoDB.new
+        return unless config.exist?
 
         @config = {
-          :host => mongo ? mongo.connection.host : mongoid[:hosts].first.split(/:/).first,
-          :port => mongo ? mongo.connection.port : mongoid[:hosts].first.split(/:/).last,
-          :database => mongo ? mongo.name : mongoid[:database],
-          :dump_tool => dump_tool_path
+          :host => config.host,
+          :port => config.port,
+          :database => config.database,
+          :dump_tool => config.dump_tool
         }.tap do |h|
-          if auth = mongo ? mongo.connection.auths.first : mongoid
-            h.update(:username => auth['username'], :password => auth['password'])
-          end
+          h[:username] = config.username if config.username
+          h[:password] = config.password if config.password
         end
       end
     end

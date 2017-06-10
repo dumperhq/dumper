@@ -19,7 +19,8 @@ module Dumper
         @config[:password].blank? ? '' : "PGPASSWORD='#{@config[:password]}'"
       end
 
-      def set_config_for(rails_env=nil)
+      def set_config
+        rails_env = block_given? ? yield : Rails.env
         return unless defined?(ActiveRecord::Base) &&
           ActiveRecord::Base.configurations &&
           (config = ActiveRecord::Base.configurations[rails_env]) &&

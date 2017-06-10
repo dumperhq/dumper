@@ -1,7 +1,6 @@
 appraise 'rails-3' do
   gem 'rails', '~> 3.2'
   gem 'mongoid', '~> 3.1'
-  gem 'mongo_mapper'
 end
 
 appraise 'rails-4' do

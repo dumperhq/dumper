@@ -9,31 +9,25 @@ module Dumper
       :redis      =>  Dumper::Database::Redis,
     }
 
-    attr_accessor :rails_env, :dispatcher, :framework, :rackup, :databases
+    attr_accessor :dispatcher, :framework, :rackup, :databases
 
     def initialize(options = {})
       @databases = {}
 
       # Rackup?
-      @rackup = defined?(Rack::Server) && find_instance_in_object_space(Rack::Server)
+      @rackup = first_instance_of('Rack::Server')
 
       # Rails?
       if defined?(::Rails)
         @framework = :rails
-        @rails_env = Rails.env.to_s
-        @rails_version = Rails::VERSION::STRING
         @is_supported_rails_version = (::Rails::VERSION::MAJOR >= 3)
       else
         @framework = :ruby
       end
 
-      if defined?(MongoMapper)
-        MongoMapper.database # Trigger to create a Mongo::DB instance
-      end
-
       DATABASES.each do |key, klass|
         database = klass.new
-        next unless database.set_config_for(@rails_env) || database.set_config_for(options[:additional_env])
+        next unless database.set_config || database.set_config { options[:additional_env] }
         if options[key].is_a?(Hash)
           database.custom_options = options[key][:custom_options]
           database.format         = options[key][:format]
@@ -42,7 +36,7 @@ module Dumper
       end
 
       # Which dispatcher?
-      [ :puma, :unicorn, :passenger, :thin, :mongrel, :webrick, :pow, :resque ].find do |name|
+      [:puma, :unicorn, :passenger, :thin, :webrick, :pow, :resque].find do |name|
         @dispatcher = send("#{name}?") ? name : nil
       end
     end
@@ -50,8 +44,8 @@ module Dumper
     def to_hash
       {
         framework: @framework,
-        rails_env: @rails_env,
-        rails_version: @rails_version,
+        rails_env: Rails.env,
+        rails_version: Rails::VERSION::STRING,
         dispatcher: @dispatcher,
         configs: Hash[@databases.map{|k, database| [ k, database.config.reject{|k,v| k == :password } ] }]
       }
@@ -64,12 +58,12 @@ module Dumper
 
     # Dispatcher
     def puma?
-      defined?(::Puma::Runner) && find_instance_in_object_space(::Puma::Runner) || # puma 2.3.0 or later
-        (@rackup && @rackup.server.to_s.demodulize == 'Puma')
+      has_instance_of?('::Puma::Runner') || # puma 2.3.0 or later
+        rackup_with?('Puma')
     end
 
     def unicorn?
-      defined?(::Unicorn::HttpServer) && find_instance_in_object_space(::Unicorn::HttpServer)
+      has_instance_of?('::Unicorn::HttpServer')
     end
 
     def passenger?
@@ -77,27 +71,26 @@ module Dumper
     end
 
     def thin?
-      defined?(::Thin::Server) && find_instance_in_object_space(::Thin::Server) ||
-        (@rackup && @rackup.server.to_s.demodulize == 'Thin')
-    end
-
-    def mongrel?
-      # defined?(::Mongrel::HttpServer)
-      @rackup and @rackup.server.to_s.demodulize == 'Mongrel'
+      has_instance_of?('::Thin::Server') || rackup_with?('Thin')
     end
 
     def webrick?
-      # defined?(::WEBrick::VERSION)
-      @rackup and @rackup.server.to_s.demodulize == 'WEBrick'
+      rackup_with?('WEBrick')
     end
 
     def pow?
       # https://github.com/josh/nack/blob/master/bin/nack_worker
-      defined?(::Nack::Server) && find_instance_in_object_space(::Nack::Server)
+      has_instance_of?('::Nack::Server')
     end
 
     def resque?
       defined?(::Resque) && (ENV['QUEUES'] || ENV['QUEUE'])
+    end
+
+  private
+
+    def rackup_with?(name)
+      @rackup && @rackup.server.to_s.demodulize == name
     end
   end
 end

@@ -1,0 +1,8 @@
+test:
+  clients:
+    default:
+      database: dumper_test_db
+      hosts:
+        - localhost:27017
+      user: dumper_test_user
+      password: dumper_test_password

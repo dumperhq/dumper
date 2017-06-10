@@ -9,9 +9,8 @@ module Dumper
         "cd #{tmpdir} && cp #{@config[:dbpath]} #{uncompressed} && gzip #{uncompressed}"
       end
 
-      def set_config_for(rails_env=nil)
-        return unless defined?(::Redis) &&
-          (main_thread_redis = find_instance_in_object_space(::Redis))
+      def set_config
+        return unless main_thread_redis = first_instance_of('::Redis')
 
         client = main_thread_redis.client
 

@@ -16,7 +16,6 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
   gem.version       = Dumper::VERSION
 
-  gem.add_runtime_dependency 'multi_json', '>= 1.0'
   gem.add_runtime_dependency 'multipart-post', '>= 1.1.5'
   gem.add_runtime_dependency 'posix-spawn', '>= 0.3.6'
 

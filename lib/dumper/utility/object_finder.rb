@@ -1,8 +1,14 @@
 module Dumper
   module Utility
     module ObjectFinder
-      def find_instance_in_object_space(klass)
-        ObjectSpace.each_object(klass).first
+      def has_instance_of?(name)
+        !!first_instance_of(name)
+      end
+
+      def first_instance_of(name)
+        return unless Object.const_defined?(name)
+
+        ObjectSpace.each_object(Object.const_get(name)).first
       end
     end
   end

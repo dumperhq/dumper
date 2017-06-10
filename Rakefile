@@ -11,3 +11,8 @@ if !ENV['APPRAISAL_INITIALIZED'] && !ENV['TRAVIS']
 else
   task :default => :spec
 end
+
+desc 'Setup test MongoDB database and user'
+task :setup_mongo do
+  puts `mongo spec/config/mongo_setup.js`
+end

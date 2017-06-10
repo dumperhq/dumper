@@ -1,6 +1,5 @@
 require 'timeout'
 require 'net/http'
-require 'dumper/patch'
 
 module Dumper
   class Agent
@@ -35,10 +34,9 @@ module Dumper
       @stack = Dumper::Stack.new(options)
       @api_base = options[:api_base] || 'https://dumper.io'
       @app_key = options[:app_key]
-      @app_env = @stack.rails_env
       @app_name = ObjectSpace.each_object(Rails::Application).first.class.name.split("::").first
       if options[:debug]
-        logger.level = stdout_logger.level = Logger::DEBUG
+        logger.level = Logger::DEBUG
         Thread.abort_on_exception = true
       end
     end
@@ -53,7 +51,7 @@ module Dumper
 
     def start_loop
       sec = 1
-      register_body = MultiJson.dump(register_hash)
+      register_body = JSON.generate(register_hash)
       log "message body for agent/register: #{register_body}", :debug
       begin
         sec *= 2
@@ -117,7 +115,7 @@ module Dumper
       end
       request = Net::HTTP::Post.new(uri.request_uri)
       request['x-app-key'] = @app_key
-      request['x-app-env'] = @app_env
+      request['x-app-env'] = Rails.env
       request['x-api-version'] = API_VERSION.to_s
       request['user-agent'] = "Dumper-RailsAgent/#{Dumper::VERSION} (ruby #{::RUBY_VERSION} #{::RUBY_PLATFORM} / rails #{Rails::VERSION::STRING})"
       if options[:params]
@@ -131,7 +129,7 @@ module Dumper
       response = http.request(request)
       if response.code == '200'
         log response.body, :debug
-        MultiJson.load(response.body).with_indifferent_access
+        JSON.parse(response.body).with_indifferent_access
       else
         log "******** ERROR on api: #{method_name}, resp code: #{response.code} ********", :error
         {} # return empty hash
