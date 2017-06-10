@@ -72,6 +72,15 @@ describe Dumper do
       expect(stack.databases[:postgresql]).not_to eq(nil)
     end
 
+    it 'detects additional env' do
+      require 'active_record'
+      ActiveRecord::Base.configurations.clear
+      ActiveRecord::Base.configurations['more_development'] = { 'adapter' => 'postgresql' }
+
+      stack = Dumper::Stack.new(additional_env: 'more_development')
+      expect(stack.databases[:postgresql]).not_to eq(nil)
+    end
+
     it 'detects redis' do
       require 'redis'
       redis = Redis.new

@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+# Launch console:
+# appraisal rails-5 bin/console
+
+require_relative '../spec/spec_helper'
+require 'pry'
+Pry.start
