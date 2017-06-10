@@ -20,12 +20,14 @@ Add the following line to your Rails project Gemfile:
 gem 'dumper'
 ```
 
-If your database is larger than 300MB, it is recommended to also include `aws-sdk` gem for maximum stability.
+If your database is larger than 300MB, it is recommended to also include `aws-sdk-v1` gem for maximum stability.
 
 ```ruby
-gem 'aws-sdk', '>= 1.8.1.2', '< 2.0'
+gem 'aws-sdk-v1'
 gem 'dumper'
 ```
+
+Note: If you're using v2 of `aws-sdk`, [you can also use both versions at the same time](https://aws.amazon.com/blogs/developer/aws-sdk-for-ruby-v2-preview-release/).
 
 then run the installer:
 
