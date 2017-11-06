@@ -11,7 +11,7 @@ describe Dumper do
     expect {
       Dumper::Agent
       # Dumper::Cli
-      Dumper::Dependency
+      # Dumper::Dependency
       Dumper::Job
       Dumper::Stack
       Dumper::Utility
