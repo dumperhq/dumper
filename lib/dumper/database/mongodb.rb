@@ -27,7 +27,7 @@ module Dumper
           :host => config.host,
           :port => config.port,
           :database => config.database,
-          :dump_tool => config.dump_tool
+          :dump_tool => dump_tool_path
         }.tap do |h|
           h[:username] = config.username if config.username
           h[:password] = config.password if config.password
