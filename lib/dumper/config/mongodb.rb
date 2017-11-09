@@ -13,6 +13,7 @@ module Dumper
       end
 
       def exist?
+        defined?(Mongoid) and
         default.present?
       end
 
