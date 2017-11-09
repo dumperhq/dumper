@@ -13,7 +13,9 @@ module Dumper
         return unless defined?(::Redis) &&
           (main_thread_redis = find_instance_in_object_space(::Redis))
 
-        client = main_thread_redis.client
+        # redis-rb v4 added CLIENT command support
+        m = main_thread_redis.respond_to?(:_client) ? :_client : :client
+        client = main_thread_redis.send(m)
 
         # New connection for the agent thread
         redis = ::Redis.new(:host => client.host, :port => client.port, :password => client.password, :db => client.db)
