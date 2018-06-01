@@ -16,6 +16,11 @@ describe Dumper do
       Dumper::Stack
       Dumper::Utility
       Dumper::VERSION
+      Dumper::Config::Base
+      Dumper::Config::MySQL
+      Dumper::Config::PostgreSQL
+      Dumper::Config::MongoDB
+      Dumper::Config::Redis
       Dumper::Database::Base
       Dumper::Database::MySQL
       Dumper::Database::PostgreSQL
@@ -32,14 +37,6 @@ describe Dumper do
     end
 
     it 'detects mongoid' do
-      if Mongoid::VERSION >= '5.0'
-        Mongoid.load!(Rails.root.join('config/mongoid5.yml'))
-        # Mongoid::Clients.default # Trigger Mongoid::Clients::Factory.create(:default)
-      else
-        Mongoid.load!(Rails.root.join('config/mongoid4.yml'))
-        # Moped::Session.new(['localhost:27017'])
-      end
-
       stack = Dumper::Stack.new
       expect(stack.databases[:mongodb]).not_to eq(nil)
       expect(stack.databases[:mongodb].config).to be_present
@@ -76,9 +73,6 @@ describe Dumper do
     end
 
     it 'detects redis' do
-      require 'redis'
-      redis = Redis.new
-
       stack = Dumper::Stack.new
       expect(stack.databases[:redis]).not_to eq(nil)
       expect(stack.databases[:redis].config).to be_present

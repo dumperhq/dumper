@@ -5,7 +5,10 @@ require 'dumper/utility/log'
 require 'dumper/utility/object_finder'
 
 require 'dumper/config/base'
+require 'dumper/config/mysql'
+require 'dumper/config/postgresql'
 require 'dumper/config/mongodb'
+require 'dumper/config/redis'
 
 require 'dumper/database/base'
 require 'dumper/database/mysql'

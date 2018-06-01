@@ -42,7 +42,7 @@ module Dumper
     end
 
     def start
-      log "stack: #{@stack.to_hash} - supported: #{@stack.supported?}", :debug
+      log "stack: #{@stack.to_h} - supported: #{@stack.supported?}", :debug
       return unless @stack.supported?
 
       @loop_thread = Thread.new { start_loop }
@@ -102,7 +102,7 @@ module Dumper
         :hostname => Socket.gethostname,
         :agent_version => Dumper::VERSION,
         :app_name => @app_name,
-        :stack => @stack.to_hash,
+        :stack => @stack.to_h,
       }
     end
 

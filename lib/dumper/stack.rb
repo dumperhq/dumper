@@ -41,7 +41,7 @@ module Dumper
       end
     end
 
-    def to_hash
+    def to_h
       {
         framework: @framework,
         rails_env: Rails.env,

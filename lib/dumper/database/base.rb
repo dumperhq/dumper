@@ -1,6 +1,7 @@
 module Dumper
   module Database
     class Base
+      include POSIX::Spawn
       include Dumper::Utility::ObjectFinder
 
       attr_accessor :tmpdir, :filename, :config, :custom_options, :format

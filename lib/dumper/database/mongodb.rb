@@ -10,8 +10,8 @@ module Dumper
 
       def connection_options
         [ :database, :host, :port, :username, :password ].map do |option|
-          next if @config[option].blank?
-          "--#{option}='#{@config[option]}'".gsub('--database', '--db')
+          next if config.send(option).blank?
+          "--#{option}='#{config.send(option)}'".gsub('--database', '--db')
         end.compact.join(' ')
       end
 
@@ -23,7 +23,7 @@ module Dumper
         config = Dumper::Config::MongoDB.new
         return unless config.exist?
 
-        @config = {
+        @old_config = {
           :host => config.host,
           :port => config.port,
           :database => config.database,
